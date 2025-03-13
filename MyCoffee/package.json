@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "reset-project": "expo customize app && rm -rf app/* && mv app/.app.config.js . && mv app/package.json . && expo install && git clean -fdx"
   },
   "dependencies": {
     "@react-navigation/native": "^7.0.15",
