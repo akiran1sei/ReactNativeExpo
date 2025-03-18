@@ -28,18 +28,18 @@ export default function Index() {
   } else {
     return (
       <View style={styles.container}>
-        <View style={styles.topMain}>
+        <View style={styles.contents}>
           <View style={styles.absoluteBox}>
             <View style={styles.title}>
               <Text style={styles.titleText}>Coffee Note</Text>
             </View>
           </View>
-          <View style={styles.buttons}>
-            <Link href="/create" style={styles.button}>
-              <IconButton icon="plus" size={50} />
+          <View style={[styles.buttons, styles.homeButtons]}>
+            <Link href="/create" style={[styles.button, styles.homeButton]}>
+              <IconButton icon="plus" size={50} iconColor="#D2B48C" />
             </Link>
-            <Link href="/list" style={styles.button}>
-              <IconButton icon="view-list" size={50} />
+            <Link href="/list" style={[styles.button, styles.homeButton]}>
+              <IconButton icon="view-list" size={50} iconColor="#D2B48C" />
             </Link>
           </View>
         </View>
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5F5F5",
   },
-  topMain: {
+  contents: {
     flex: 1,
     justifyContent: "center", // 縦方向の中心に配置
     alignItems: "center", // 横方向の中心に配置
@@ -75,14 +75,16 @@ const styles = StyleSheet.create({
     color: "#D2B48C",
     fontSize: 48,
   },
-  buttons: {
-    flexDirection: "column",
-  },
+  buttons: {},
+  homeButtons: { flexDirection: "column" },
   button: {
     textDecorationLine: "underline",
-    color: "#007BFF",
-    backgroundColor: "#D2B48C",
+
     marginVertical: 10,
+  },
+  homeButton: {
+    // color: "#007BFF",
+    backgroundColor: "#6f4e37",
     borderRadius: 10,
   },
 });
