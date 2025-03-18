@@ -1,28 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Link } from "expo-router";
 import { IconButton } from "react-native-paper";
+import * as Font from "expo-font"; // expo-fontをインポート
 
 export default function Index() {
-  return (
-    <View style={styles.container}>
-      <View style={styles.topMain}>
-        <View style={styles.absoluteBox}>
-          <View style={styles.title}>
-            <Text style={styles.titleText}>Coffee Note</Text>
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    // 副作用の処理
+    async function loadFonts() {
+      // 非同期関数に変更
+      await Font.loadAsync({
+        // フォントを読み込む
+        Caveat: require("../assets/fonts/Caveat-VariableFont_wght.ttf"), // フォントファイルのパスを修正
+      });
+      setLoading(true); // フォント読み込み後にローディング状態をtrueにする
+    }
+    loadFonts(); // 関数を実行
+  }, []);
+
+  if (!loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.container}>
+        <View style={styles.topMain}>
+          <View style={styles.absoluteBox}>
+            <View style={styles.title}>
+              <Text style={styles.titleText}>Coffee Note</Text>
+            </View>
+          </View>
+          <View style={styles.buttons}>
+            <Link href="/create" style={styles.button}>
+              <IconButton icon="plus" size={50} />
+            </Link>
+            <Link href="/list" style={styles.button}>
+              <IconButton icon="view-list" size={50} />
+            </Link>
           </View>
         </View>
-        <View style={styles.buttons}>
-          <Link href="/create" style={styles.button}>
-            <IconButton icon="plus" size={50} />
-          </Link>
-          <Link href="/list" style={styles.button}>
-            <IconButton icon="view-list" size={50} />
-          </Link>
-        </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
