@@ -29,7 +29,7 @@ export default function Index() {
     return (
       <View style={styles.container}>
         <View style={styles.contents}>
-          <View style={styles.absoluteBox}>
+          <View style={[styles.absoluteBox, styles.pageTitle]}>
             <View style={styles.title}>
               <Text style={styles.titleText}>Coffee Note</Text>
             </View>
@@ -57,18 +57,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center", // 縦方向の中心に配置
     alignItems: "center", // 横方向の中心に配置
-    paddingVertical: 20,
   },
   absoluteBox: {
+    flex: 1,
+    justifyContent: "center", // 縦方向の中心に配置
     position: "absolute",
-    top: 0,
     left: 0,
     right: 0,
-    height: 100, // 高さを指定（必要に応じて）
   },
   title: {
     alignItems: "center",
-    marginBottom: 50, // buttonsとの間隔を空ける
   },
   titleText: {
     fontFamily: "Caveat",
@@ -82,6 +80,7 @@ const styles = StyleSheet.create({
 
     marginVertical: 10,
   },
+  pageTitle: { top: 80, height: 80 },
   homeButton: {
     // color: "#007BFF",
     backgroundColor: "#6f4e37",
