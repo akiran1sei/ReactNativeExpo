@@ -9,6 +9,7 @@ import NumberComponent from "@/components/NumberComponent";
 import ImageUploadComponent from "@/components/ImageUploadComponent";
 import TextAreaComponent from "@/components/TextAreaComponent";
 import MeasuredTimeInputComponent from "@/components/MeasuredTimeInputComponent ";
+import MyChart from "@/components/Chart/Chart";
 
 export default function CreateScreen() {
   const TextData = "Coffee Create"; // ページタイトルに表示するテキスト
@@ -49,6 +50,7 @@ export default function CreateScreen() {
             contentContainerStyle={styles.scrollContainer}
             showsVerticalScrollIndicator={true}
           >
+            <MyChart />
             <ImageUploadComponent />
             <InputComponent dataTitle={InputLabel.beansName} />
             <InputComponent dataTitle={InputLabel.variety} />
