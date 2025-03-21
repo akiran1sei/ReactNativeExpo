@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native"; // TouchableOpacity をインポート
 import Slider from "@react-native-community/slider"; // Slider をインポート
 import { FontAwesome } from "@expo/vector-icons"; // ベクトルアイコンをインポート
-const RangeComponent = () => {
+const RangeComponent = (props: { dataTitle: string }) => {
   const [sliderValue, setSliderValue] = useState(0); // 初期値を0とする
 
   const handleValueChange = (value: number) => {
@@ -22,7 +22,7 @@ const RangeComponent = () => {
   };
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>抽出方法</Text>
+      <Text style={styles.label}>{props.dataTitle}</Text>
       <View style={styles.sliderContainer}>
         <View style={styles.sliderAndButtons}>
           <TouchableOpacity onPress={decrementValue} style={styles.button}>

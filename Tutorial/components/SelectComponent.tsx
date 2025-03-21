@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { Picker } from "@react-native-picker/picker"; // Picker をインポート
 
-const SelectComponent = () => {
+const SelectComponent = (props: { dataTitle: string }) => {
   const [selectedMethod, setSelectedMethod] = useState("");
   const methods = [
     { label: "ハンドドリップ", value: "handdrip" },
@@ -13,7 +13,7 @@ const SelectComponent = () => {
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>抽出方法</Text>
+      <Text style={styles.label}>{props.dataTitle}</Text>
       <Picker
         selectedValue={selectedMethod}
         onValueChange={(itemValue) => setSelectedMethod(itemValue)}

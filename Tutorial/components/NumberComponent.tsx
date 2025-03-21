@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Text, TextInput } from "react-native";
 
-const NumberComponent = () => {
+const NumberComponent = (props: { dataTitle: string }) => {
   const [inputValue, setInputValue] = useState("0"); // 初期値を文字列"0"とする
   const [isFocused, setIsFocused] = useState(false);
 
@@ -27,7 +27,7 @@ const NumberComponent = () => {
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>温度（℃）</Text>
+      <Text style={styles.label}>{props.dataTitle}</Text>
       <TextInput
         style={[styles.numberInput, isFocused && styles.focusedInput]}
         value={inputValue}
