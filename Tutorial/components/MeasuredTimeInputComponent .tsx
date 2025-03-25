@@ -88,7 +88,7 @@ const MeasuredTimeInputComponent = () => {
 const styles = StyleSheet.create({
   inputContainer: {
     width: "90%",
-    marginBottom: 20,
+    marginBottom: 10,
     marginHorizontal: "auto",
   },
   label: {
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
+    borderColor: "#D2B48C",
     marginTop: -1,
   },
   timeInputWrapper: {
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   timeUnit: {
     marginLeft: 5,
-    fontSize: 16,
+    fontSize: 18,
   },
   timeSeparator: {
     marginHorizontal: 10,

@@ -67,7 +67,7 @@ const RangeComponent: React.FC<RangeComponentProps> = ({
 const styles = StyleSheet.create({
   inputContainer: {
     width: "90%",
-    marginBottom: 20,
+    marginBottom: 10,
     marginHorizontal: "auto",
   },
   label: {
@@ -86,11 +86,13 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
     marginTop: -1,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#D2B48C",
   },
   valueText: {
     color: "#000",
-    marginTop: 10,
-    fontSize: 16,
+    marginVertical: 10,
+    fontSize: 18,
   },
   sliderAndButtons: {
     flexDirection: "row",

@@ -12,12 +12,12 @@ const SelectComponent = (props: { dataTitle: string }) => {
   ];
 
   return (
-    <View style={styles.inputContainer}>
+    <View style={styles.selectContainer}>
       <Text style={styles.label}>{props.dataTitle}</Text>
       <Picker
         selectedValue={selectedMethod}
         onValueChange={(itemValue) => setSelectedMethod(itemValue)}
-        style={styles.input} // スタイルはinputのまま
+        style={styles.select} // スタイルはinputのまま
       >
         <Picker.Item label="選択してください" value="" />
         {methods.map((method) => (
@@ -33,9 +33,9 @@ const SelectComponent = (props: { dataTitle: string }) => {
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
+  selectContainer: {
     width: "90%",
-    marginBottom: 20,
+    marginBottom: 10,
     marginHorizontal: "auto",
   },
   label: {
@@ -47,15 +47,17 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
     textAlign: "center",
   },
-  input: {
-    // スタイル名はinputのまま
+  select: {
     width: "100%",
     backgroundColor: "#FFF",
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
+    borderColor: "#D2B48C",
     marginTop: -1,
+    paddingVertical: 16, // 1rem をピクセルに変換 (1rem = 16px)
+    paddingHorizontal: 0,
+    fontSize: 18,
   },
 });
 

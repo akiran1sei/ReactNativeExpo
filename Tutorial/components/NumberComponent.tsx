@@ -43,7 +43,7 @@ const NumberComponent = (props: { dataTitle: string }) => {
 const styles = StyleSheet.create({
   inputContainer: {
     width: "90%",
-    marginBottom: 20,
+    marginBottom: 10,
     marginHorizontal: "auto",
   },
   label: {
@@ -62,9 +62,10 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     borderWidth: 1,
-    borderColor: "#FFF",
+    borderColor: "#D2B48C",
     paddingHorizontal: 10,
     fontSize: 18,
+    textAlign: "center",
   },
   focusedInput: {
     borderColor: "#D2B48C", // フォーカス時のボーダーカラー

@@ -57,10 +57,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#D2B48C",
     borderRadius: 10,
     padding: 10,
+    marginBottom: 10, // 下マージンを追加
   },
   imageContents: {
     width: "90%", // 幅を90%に設定
-    marginBottom: 20, // 下マージンを追加
+    marginBottom: 10, // 下マージンを追加
     marginHorizontal: "auto", // 左右マージンをautoに設定
   },
   imageButton: {

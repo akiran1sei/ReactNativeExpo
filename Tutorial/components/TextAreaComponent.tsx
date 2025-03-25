@@ -23,7 +23,7 @@ const TextAreaComponent = () => {
 const styles = StyleSheet.create({
   inputContainer: {
     width: "90%", // 幅を90%に設定
-    marginBottom: 20, // 下マージンを追加
+    marginBottom: 10, // 下マージンを追加
     marginHorizontal: "auto", // 左右マージンをautoに設定
   },
 
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10, // 左下の角丸
     borderBottomRightRadius: 10, // 右下の角丸
     borderWidth: 1, // 枠線の太さ
-    borderColor: "#FFF", // 枠線の色
+    borderColor: "#D2B48C", // 枠線の色
     marginTop: -1, // ラベルとの隙間をなくす
     height: 100, // テキストエリアの高さを設定
     textAlignVertical: "top", // テキストを上から配置
