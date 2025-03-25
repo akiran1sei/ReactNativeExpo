@@ -1,35 +1,50 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native"; // TouchableOpacity をインポート
-import Slider from "@react-native-community/slider"; // Slider をインポート
-import { FontAwesome } from "@expo/vector-icons"; // ベクトルアイコンをインポート
-const RangeComponent = (props: { dataTitle: string }) => {
-  const [sliderValue, setSliderValue] = useState(0); // 初期値を0とする
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import Slider from "@react-native-community/slider";
+import { FontAwesome } from "@expo/vector-icons";
+
+interface RangeComponentProps {
+  dataTitle: string;
+  onChange: (value: number) => void; // onChange プロパティを追加
+}
+
+const RangeComponent: React.FC<RangeComponentProps> = ({
+  dataTitle,
+  onChange, // props を受け取る
+}) => {
+  const [sliderValue, setSliderValue] = useState(0);
 
   const handleValueChange = (value: number) => {
     setSliderValue(value);
+    onChange(value); // 値が変更されたときに onChange を呼び出す
   };
 
   const incrementValue = () => {
     if (sliderValue + 0.5 <= 5) {
-      setSliderValue((prevValue) => parseFloat((prevValue + 0.5).toFixed(1))); // 加算後にtoFixedを適用
+      const newValue = parseFloat((sliderValue + 0.5).toFixed(1));
+      setSliderValue(newValue);
+      onChange(newValue); // 値が変更されたときに onChange を呼び出す
     }
   };
 
   const decrementValue = () => {
     if (sliderValue - 0.5 >= 0) {
-      setSliderValue((prevValue) => parseFloat((prevValue - 0.5).toFixed(1))); // 減算後にtoFixedを適用
+      const newValue = parseFloat((sliderValue - 0.5).toFixed(1));
+      setSliderValue(newValue);
+      onChange(newValue); // 値が変更されたときに onChange を呼び出す
     }
   };
+
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>{props.dataTitle}</Text>
+      <Text style={styles.label}>{dataTitle}</Text>
       <View style={styles.sliderContainer}>
         <View style={styles.sliderAndButtons}>
           <TouchableOpacity onPress={decrementValue} style={styles.button}>
             <FontAwesome name="minus" size={20} color="#D2B48C" />
           </TouchableOpacity>
           <Slider
-            style={{ width: "60%", height: 40 }} // 幅を調整
+            style={{ width: "60%", height: 40 }}
             minimumValue={0}
             maximumValue={5}
             step={0.5}
@@ -91,13 +106,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 10,
-    // iOSの影
     shadowColor: "#000000",
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
-    // Androidの影
     elevation: 3,
   },
 });
+
 export default RangeComponent;

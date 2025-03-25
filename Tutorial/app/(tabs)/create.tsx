@@ -37,7 +37,17 @@ export default function CreateScreen() {
     dose: "紛量（g）",
     water: "湯量（g）",
   });
-
+  const [rangeValues, setRangeValues] = useState({
+    acidity: 0,
+    bitter: 0,
+    sweet: 0,
+    rich: 0,
+    aroma: 0,
+    aftertaste: 0,
+  });
+  const handleRangeChange = (label: string, value: number) => {
+    setRangeValues({ ...rangeValues, [label]: value });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contents}>
@@ -50,7 +60,6 @@ export default function CreateScreen() {
             contentContainerStyle={styles.scrollContainer}
             showsVerticalScrollIndicator={true}
           >
-            <RadarChart />
             <ImageUploadComponent />
             <InputComponent dataTitle={InputLabel.beansName} />
             <InputComponent dataTitle={InputLabel.variety} />
@@ -59,17 +68,38 @@ export default function CreateScreen() {
             <SelectComponent dataTitle={SelectLabel.extractionMethod} />
             <SelectComponent dataTitle={SelectLabel.extractionEquipment} />
             <SelectComponent dataTitle={SelectLabel.Grind} />
-            <RangeComponent dataTitle={RangeLabel.acidity} />
-            <RangeComponent dataTitle={RangeLabel.bitter} />
-            <RangeComponent dataTitle={RangeLabel.sweet} />
-            <RangeComponent dataTitle={RangeLabel.rich} />
-            <RangeComponent dataTitle={RangeLabel.aroma} />
-            <RangeComponent dataTitle={RangeLabel.aftertaste} />
 
             <NumberComponent dataTitle={NumberLabel.temperature} />
             <NumberComponent dataTitle={NumberLabel.dose} />
             <NumberComponent dataTitle={NumberLabel.water} />
             <MeasuredTimeInputComponent />
+            <RangeComponent
+              dataTitle={RangeLabel.acidity}
+              onChange={(value: number) => handleRangeChange("acidity", value)}
+            />
+            <RangeComponent
+              dataTitle={RangeLabel.bitter}
+              onChange={(value: number) => handleRangeChange("bitter", value)}
+            />
+            <RangeComponent
+              dataTitle={RangeLabel.sweet}
+              onChange={(value: number) => handleRangeChange("sweet", value)}
+            />
+            <RangeComponent
+              dataTitle={RangeLabel.rich}
+              onChange={(value: number) => handleRangeChange("rich", value)}
+            />
+            <RangeComponent
+              dataTitle={RangeLabel.aroma}
+              onChange={(value: number) => handleRangeChange("aroma", value)}
+            />
+            <RangeComponent
+              dataTitle={RangeLabel.aftertaste}
+              onChange={(value: number) =>
+                handleRangeChange("aftertaste", value)
+              }
+            />
+            <RadarChart data={rangeValues} />
             <TextAreaComponent />
           </ScrollView>
         </View>

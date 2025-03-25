@@ -5,28 +5,40 @@ import {
   VictoryChart,
   VictoryTheme,
   VictoryLine,
+  VictoryArea,
 } from "victory-native";
-const data = [
-  { x: "酸味", y: 1 },
-  { x: "苦味", y: 0.5 },
-  { x: "甘味", y: 1 },
-  { x: "コク", y: 1.5 },
-  { x: "香り", y: 2.5 },
-  { x: "後味", y: 3.5 },
-  { x: "酸味", y: 1 }, // 閉じるための最初のデータを再度追加
-];
+interface RadarChartProps {
+  data: {
+    acidity: number;
+    bitter: number;
+    sweet: number;
+    rich: number;
+    aroma: number;
+    aftertaste: number;
+  };
+}
 
-const RadarChart = () => {
+const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
+  const chartData = [
+    { x: "酸味", y: data.acidity },
+    { x: "苦味", y: data.bitter },
+    { x: "甘味", y: data.sweet },
+    { x: "コク", y: data.rich },
+    { x: "香り", y: data.aroma },
+    { x: "後味", y: data.aftertaste },
+    { x: "酸味", y: data.acidity },
+  ];
+
   return (
     <View style={styles.container}>
-      <VictoryChart polar domain={{ y: [0, 5] }} theme={VictoryTheme.clean}>
+      <VictoryChart polar domain={{ y: [0, 5] }} theme={VictoryTheme.material}>
         <VictoryPolarAxis
           dependentAxis
           style={{ axis: { stroke: "none" } }}
-          tickFormat={data}
+          tickFormat={chartData}
         />
         <VictoryPolarAxis />
-        <VictoryLine data={data} />
+        <VictoryLine data={chartData} />
       </VictoryChart>
     </View>
   );
