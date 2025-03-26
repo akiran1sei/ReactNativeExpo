@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, SafeAreaView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  Image,
+} from "react-native";
 import HeaderComponent from "@/components/HeaderComponent";
 import PageTitleComponent from "@/components/PageTitleComponent";
 import SelectComponent from "@/components/SelectComponent";
@@ -13,6 +19,7 @@ import RadarChart from "@/components/RadarChart/RadarChart";
 
 export default function CreateScreen() {
   const TextData = "Coffee Create"; // ページタイトルに表示するテキスト
+
   const [InputLabel, setInputLabel] = useState({
     beansName: "名称",
     variety: "品種",
@@ -45,9 +52,54 @@ export default function CreateScreen() {
     aroma: 0,
     aftertaste: 0,
   });
+  const [imageData, setImageData] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    imageData: "",
+    beansName: "",
+    variety: "",
+    productionArea: "",
+    roastingDegree: "",
+    extractionMethod: "",
+    extractionMaker: "",
+    Grind: "",
+    temperature: 0,
+    dose: 0,
+    water: 0,
+    measuredTime: "", // MeasuredTimeInputComponent の値
+    acidity: 0,
+    bitter: 0,
+    sweet: 0,
+    rich: 0,
+    aroma: 0,
+    aftertaste: 0,
+    textArea: "", // TextAreaComponent の値
+  });
+
+  const handleInputChange = (label: string, value: string | number) => {
+    setFormData({ ...formData, [label]: value });
+  };
+
+  const handleSelectChange = (label: string, value: string) => {
+    setFormData({ ...formData, [label]: value });
+  };
+
   const handleRangeChange = (label: string, value: number) => {
+    setFormData({ ...formData, [label]: value });
     setRangeValues({ ...rangeValues, [label]: value });
   };
+
+  const handleTextAreaChange = (value: string) => {
+    setFormData({ ...formData, textArea: value });
+  };
+
+  const handleMeasuredTimeChange = (value: string) => {
+    setFormData({ ...formData, measuredTime: value });
+  };
+  const handleImageChange = (value: string) => {
+    setImageData(value);
+    setFormData({ ...formData, imageData: value }); // imageData の更新後に formData を更新
+  };
+  console.log("formData", formData);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contents}>
@@ -60,19 +112,63 @@ export default function CreateScreen() {
             contentContainerStyle={styles.scrollContainer}
             showsVerticalScrollIndicator={true}
           >
-            <ImageUploadComponent />
-            <InputComponent dataTitle={InputLabel.beansName} />
-            <InputComponent dataTitle={InputLabel.variety} />
-            <InputComponent dataTitle={InputLabel.productionArea} />
-            <SelectComponent dataTitle={SelectLabel.roastingDegree} />
-            <SelectComponent dataTitle={SelectLabel.extractionMethod} />
-            <SelectComponent dataTitle={SelectLabel.extractionMaker} />
-            <SelectComponent dataTitle={SelectLabel.Grind} />
-
-            <NumberComponent dataTitle={NumberLabel.temperature} />
-            <NumberComponent dataTitle={NumberLabel.dose} />
-            <NumberComponent dataTitle={NumberLabel.water} />
-            <MeasuredTimeInputComponent />
+            {/* {imageData && (
+              <Image source={{ uri: imageData }} style={styles.preview} />
+            )} */}
+            <ImageUploadComponent onChange={handleImageChange} />
+            <InputComponent
+              dataTitle={InputLabel.beansName}
+              onChange={(value: string) =>
+                handleInputChange("beansName", value)
+              }
+            />
+            <InputComponent
+              dataTitle={InputLabel.variety}
+              onChange={(value: string) => handleInputChange("variety", value)}
+            />
+            <InputComponent
+              dataTitle={InputLabel.productionArea}
+              onChange={(value: string) =>
+                handleInputChange("productionArea", value)
+              }
+            />
+            <SelectComponent
+              dataTitle={SelectLabel.roastingDegree}
+              onChange={(value: string) =>
+                handleSelectChange("roastingDegree", value)
+              }
+            />
+            <SelectComponent
+              dataTitle={SelectLabel.extractionMethod}
+              onChange={(value: string) =>
+                handleSelectChange("extractionMethod", value)
+              }
+            />
+            <SelectComponent
+              dataTitle={SelectLabel.extractionMaker}
+              onChange={(value: string) =>
+                handleSelectChange("extractionMaker", value)
+              }
+            />
+            <SelectComponent
+              dataTitle={SelectLabel.Grind}
+              onChange={(value: string) => handleSelectChange("Grind", value)}
+            />
+            <NumberComponent
+              dataTitle={NumberLabel.temperature}
+              onChange={(value: number) =>
+                handleInputChange("temperature", value)
+              }
+            />
+            <NumberComponent
+              dataTitle={NumberLabel.dose}
+              onChange={(value: number) => handleInputChange("dose", value)}
+            />
+            <NumberComponent
+              dataTitle={NumberLabel.water}
+              onChange={(value: number) => handleInputChange("water", value)}
+            />
+            <MeasuredTimeInputComponent onChange={handleMeasuredTimeChange} />
             <RangeComponent
               dataTitle={RangeLabel.acidity}
               onChange={(value: number) => handleRangeChange("acidity", value)}
@@ -100,7 +196,7 @@ export default function CreateScreen() {
               }
             />
             <RadarChart data={rangeValues} />
-            <TextAreaComponent />
+            <TextAreaComponent onChange={handleTextAreaChange} />
           </ScrollView>
         </View>
       </View>
@@ -137,5 +233,10 @@ const styles = StyleSheet.create({
   text: {
     color: "#000",
     fontSize: 18,
+  },
+  preview: {
+    width: 200,
+    height: 200,
+    marginTop: 10,
   },
 });

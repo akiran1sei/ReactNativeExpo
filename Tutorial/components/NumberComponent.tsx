@@ -1,23 +1,29 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Text, TextInput } from "react-native";
-
-const NumberComponent = (props: { dataTitle: string }) => {
+interface NumberProps {
+  dataTitle: string;
+  onChange: (value: number) => void;
+}
+const NumberComponent: React.FC<NumberProps> = ({ dataTitle, onChange }) => {
   const [inputValue, setInputValue] = useState("0"); // 初期値を文字列"0"とする
   const [isFocused, setIsFocused] = useState(false);
 
   const handleInputChange = (text: string) => {
-    // 数値のみを受け付けるようにフィルタリング
-    const filteredText = text.replace(/[^0-9]/g, ""); // 小数点削除
+    const filteredText = text.replace(/[^0-9]/g, "");
     setInputValue(filteredText);
+    const numericValue = parseInt(filteredText, 10) || 0;
+    onChange(numericValue); // 親コンポーネントに値を渡す
   };
 
   const handleBlur = () => {
     setIsFocused(false);
-    let currentValue = parseInt(inputValue, 10) || 0; // パースの追加
+    let currentValue = parseInt(inputValue, 10) || 0;
     if (currentValue < 0) {
       setInputValue("0");
+      onChange(0); // 親コンポーネントに0を渡す
     } else {
       setInputValue(currentValue.toString());
+      onChange(currentValue); // 親コンポーネントに値を渡す
     }
   };
 
@@ -27,12 +33,13 @@ const NumberComponent = (props: { dataTitle: string }) => {
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>{props.dataTitle}</Text>
+      <Text style={styles.label}>{dataTitle}</Text>
+
       <TextInput
         style={[styles.numberInput, isFocused && styles.focusedInput]}
         value={inputValue}
         onChangeText={handleInputChange}
-        keyboardType="number-pad" // 数値入力用のキーボードを表示
+        keyboardType="number-pad"
         onBlur={handleBlur}
         onFocus={handleFocus}
       />

@@ -2,13 +2,18 @@ import React, { useState } from "react";
 import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
-const ImageUploadComponent = () => {
+interface ImagePickerProps {
+  onChange: (value: string) => void;
+}
+const ImageUploadComponent: React.FC<ImagePickerProps> = ({
+  onChange, // props を受け取る
+}) => {
   // デフォルト画像のURIを設定
   const defaultImage = require("@/assets/images/no-image.png"); // デフォルト画像へのパスを適宜変更してください
+
   const [image, setImage] = useState<string | null>(null);
 
   const pickImage = async () => {
-    // カメラロールへのアクセス許可を要求
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (status !== "granted") {
@@ -16,7 +21,6 @@ const ImageUploadComponent = () => {
       return;
     }
 
-    // 画像ピッカーを起動（更新されたAPI）
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
@@ -25,9 +29,9 @@ const ImageUploadComponent = () => {
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        // 型を明示的に処理
         const selectedUri = result.assets[0].uri;
         setImage(selectedUri);
+        onChange(selectedUri); // 選択された画像の URI を親コンポーネントに送信
       }
     } catch (error) {
       console.error("画像の選択中にエラーが発生しました:", error);

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { Picker } from "@react-native-picker/picker"; // Picker をインポート
-
-const SelectComponent = (props: { dataTitle: string }) => {
+interface SelectProps {
+  dataTitle: string;
+  onChange: (value: string) => void;
+}
+const SelectComponent: React.FC<SelectProps> = ({ dataTitle, onChange }) => {
   const [selectedMethod, setSelectedMethod] = useState("");
-  console.log(props.dataTitle);
   const methods = () => {
-    if (props.dataTitle === "焙煎度") {
+    if (dataTitle === "焙煎度") {
       return [
         { label: "ライトロースト (浅煎り)", value: "lightroast" },
         { label: "シナモンロースト (浅煎り)", value: "cinnamonroast" },
@@ -17,7 +19,7 @@ const SelectComponent = (props: { dataTitle: string }) => {
         { label: "フレンチロースト (深煎り)", value: "frenchroast" },
         { label: "イタリアンロースト (深煎り)", value: "italianroast" },
       ];
-    } else if (props.dataTitle === "抽出方法") {
+    } else if (dataTitle === "抽出方法") {
       return [
         { label: "ペーパードリップ", value: "paperdrip" },
         { label: "ネルドリップ", value: "neldrip" },
@@ -30,7 +32,7 @@ const SelectComponent = (props: { dataTitle: string }) => {
         { label: "モカポット抽出", value: "mokapotextraction" },
         { label: "水出し", value: "icedrip" },
       ];
-    } else if (props.dataTitle === "抽出メーカー") {
+    } else if (dataTitle === "抽出メーカー") {
       return [
         { label: "ハリオ (Hario)", value: "hario" },
         { label: "カリタ (Kalita)", value: "kalita" },
@@ -42,7 +44,7 @@ const SelectComponent = (props: { dataTitle: string }) => {
         { label: "ORIGAMI", value: "origami" },
         { label: "その他", value: "other" },
       ];
-    } else if (props.dataTitle === "挽き目") {
+    } else if (dataTitle === "挽き目") {
       return [
         { label: "極細挽き", value: "extrafine" },
         { label: "細挽き", value: "fine" },
@@ -57,11 +59,14 @@ const SelectComponent = (props: { dataTitle: string }) => {
 
   return (
     <View style={styles.selectContainer}>
-      <Text style={styles.label}>{props.dataTitle}</Text>
+      <Text style={styles.label}>{dataTitle}</Text>
       <Picker
         selectedValue={selectedMethod}
-        onValueChange={(itemValue) => setSelectedMethod(itemValue)}
-        style={styles.select} // スタイルはinputのまま
+        onValueChange={(itemValue) => {
+          setSelectedMethod(itemValue);
+          onChange(itemValue); // 選択された値を親コンポーネントに渡す
+        }}
+        style={styles.select}
       >
         <Picker.Item label="選択してください" value="" />
         {methods().map((method) => (

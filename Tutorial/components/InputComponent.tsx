@@ -1,16 +1,25 @@
 import React, { useState } from "react";
-
 import { View, StyleSheet, TextInput, Text } from "react-native";
 
-const InputComponent = (props: { dataTitle: string }) => {
+interface InputProps {
+  dataTitle: string;
+  onChange: (value: string) => void;
+}
+
+const InputComponent: React.FC<InputProps> = ({ dataTitle, onChange }) => {
   const [inputText, setInputText] = useState("");
+
+  const handleInputChange = (text: string) => {
+    setInputText(text);
+    onChange(text); // 親コンポーネントに値を渡す
+  };
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>{props.dataTitle}</Text>
+      <Text style={styles.label}>{dataTitle}</Text>
       <TextInput
         style={styles.input}
-        onChangeText={setInputText}
+        onChangeText={handleInputChange}
         value={inputText}
         placeholder="入力してください"
         placeholderTextColor="#D3D3D3"
@@ -21,30 +30,28 @@ const InputComponent = (props: { dataTitle: string }) => {
 
 const styles = StyleSheet.create({
   inputContainer: {
-    width: "90%", // 幅を80%に設定
-    marginBottom: 10, // 下マージンを追加
-    marginHorizontal: "auto", // 左右マージンをautoに設定
+    width: "90%",
+    marginBottom: 10,
+    marginHorizontal: "auto",
   },
-
   label: {
     width: "100%",
-    backgroundColor: "#D2B48C", // ラベルの背景色
-    color: "#000", // ラベルの文字色
-    padding: 10, // ラベルのパディング
-    borderTopLeftRadius: 10, // 左上の角丸
-    borderTopRightRadius: 10, // 右上の角丸
-    textAlign: "center", // テキストを中央に配置
+    backgroundColor: "#D2B48C",
+    color: "#000",
+    padding: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    textAlign: "center",
   },
-
   input: {
     width: "100%",
-    backgroundColor: "#FFF", // 入力欄の背景色
-    padding: 10, // 入力欄のパディング
-    borderBottomLeftRadius: 10, // 左下の角丸
-    borderBottomRightRadius: 10, // 右下の角丸
-    borderWidth: 1, // 枠線の太さ
-    borderColor: "#D2B48C", // 枠線の色
-    marginTop: -1, // ラベルとの隙間をなくす
+    backgroundColor: "#FFF",
+    padding: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderWidth: 1,
+    borderColor: "#D2B48C",
+    marginTop: -1,
   },
 });
 

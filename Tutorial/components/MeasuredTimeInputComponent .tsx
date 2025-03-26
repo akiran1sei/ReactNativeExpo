@@ -7,7 +7,11 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const MeasuredTimeInputComponent = () => {
+interface TimeInputProps {
+  onChange: (value: string) => void;
+}
+
+const MeasuredTimeInputComponent: React.FC<TimeInputProps> = ({ onChange }) => {
   const [minutes, setMinutes] = useState<string>("");
   const [seconds, setSeconds] = useState<string>("");
 
@@ -18,6 +22,9 @@ const MeasuredTimeInputComponent = () => {
     const numericValue = parseInt(text.replace(/[^0-9]/g, ""), 10);
     if (isNaN(numericValue) || (numericValue >= 0 && numericValue <= 99)) {
       setMinutes(text.replace(/[^0-9]/g, ""));
+      if (seconds !== "") {
+        onChange(`${text.replace(/[^0-9]/g, "")}:${seconds}`);
+      }
     }
   };
 
@@ -25,6 +32,9 @@ const MeasuredTimeInputComponent = () => {
     const numericValue = parseInt(text.replace(/[^0-9]/g, ""), 10);
     if (isNaN(numericValue) || (numericValue >= 0 && numericValue <= 59)) {
       setSeconds(text.replace(/[^0-9]/g, ""));
+      if (minutes !== "") {
+        onChange(`${minutes}:${text.replace(/[^0-9]/g, "")}`);
+      }
     }
   };
 
@@ -37,6 +47,7 @@ const MeasuredTimeInputComponent = () => {
   const resetTime = () => {
     setMinutes("");
     setSeconds("");
+    onChange("");
     if (minutesInput.current) {
       minutesInput.current.focus();
     }
