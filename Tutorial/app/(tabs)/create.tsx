@@ -4,7 +4,9 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  Image,
+  TouchableOpacity,
+  Text,
+  Alert,
 } from "react-native";
 import HeaderComponent from "@/components/HeaderComponent";
 import PageTitleComponent from "@/components/PageTitleComponent";
@@ -16,6 +18,7 @@ import ImageUploadComponent from "@/components/ImageUploadComponent";
 import TextAreaComponent from "@/components/TextAreaComponent";
 import MeasuredTimeInputComponent from "@/components/MeasuredTimeInputComponent ";
 import RadarChart from "@/components/RadarChart/RadarChart";
+import CoffeeStorageService from "@/services/CoffeeStorageService"; // ストレージサービスをインポート
 
 export default function CreateScreen() {
   const TextData = "Coffee Create"; // ページタイトルに表示するテキスト
@@ -44,14 +47,7 @@ export default function CreateScreen() {
     dose: "紛量（g）",
     water: "湯量（g）",
   });
-  const [rangeValues, setRangeValues] = useState({
-    acidity: 0,
-    bitter: 0,
-    sweet: 0,
-    rich: 0,
-    aroma: 0,
-    aftertaste: 0,
-  });
+
   const [imageData, setImageData] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     imageData: "",
@@ -65,16 +61,24 @@ export default function CreateScreen() {
     temperature: 0,
     dose: 0,
     water: 0,
-    measuredTime: "", // MeasuredTimeInputComponent の値
+    measuredTime: "",
     acidity: 0,
     bitter: 0,
     sweet: 0,
     rich: 0,
     aroma: 0,
     aftertaste: 0,
-    textArea: "", // TextAreaComponent の値
+    textArea: "",
   });
 
+  const [rangeValues, setRangeValues] = useState({
+    acidity: 0,
+    bitter: 0,
+    sweet: 0,
+    rich: 0,
+    aroma: 0,
+    aftertaste: 0,
+  });
   const handleInputChange = (label: string, value: string | number) => {
     setFormData({ ...formData, [label]: value });
   };
@@ -99,7 +103,132 @@ export default function CreateScreen() {
     setImageData(value);
     setFormData({ ...formData, imageData: value }); // imageData の更新後に formData を更新
   };
-  console.log("formData", formData);
+  // 新しい送信ハンドラー
+  const handleSubmit = async () => {
+    // 必須フィールドのバリデーション
+    const requiredFields = [
+      "beansName",
+      "variety",
+      "productionArea",
+      "roastingDegree",
+      "extractionMethod",
+    ];
+
+    // const missingFields = requiredFields.filter((field) => !formData[field]);
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field as keyof typeof formData]
+    );
+    if (missingFields.length > 0) {
+      Alert.alert(
+        "入力エラー",
+        `以下の必須項目が未入力です：\n${missingFields.join(", ")}`
+      );
+      return;
+    }
+
+    try {
+      // データ変換（CoffeeRecordの型に合わせる）
+      const coffeeRecord = {
+        name: formData.beansName,
+        variety: formData.variety,
+        origin: formData.productionArea,
+        roastLevel: formData.roastingDegree as
+          | "Light"
+          | "Medium"
+          | "Dark"
+          | "Espresso",
+        extractionMethod: formData.extractionMethod as
+          | "Drip"
+          | "Espresso"
+          | "French Press"
+          | "Pour Over"
+          | "Cold Brew",
+        extractionEquipment: formData.extractionMaker,
+        grindSize: formData.Grind as
+          | "Extra Fine"
+          | "Fine"
+          | "Medium"
+          | "Coarse"
+          | "Extra Coarse",
+        temperature: formData.temperature,
+        coffeeAmount: formData.dose,
+        waterAmount: formData.water,
+        extractionTime: parseFloat(formData.measuredTime) || 0,
+        acidity: formData.acidity,
+        bitterness: formData.bitter,
+        sweetness: formData.sweet,
+        body: formData.rich,
+        aroma: formData.aroma,
+        aftertaste: formData.aftertaste,
+        memo: formData.textArea,
+      };
+
+      // 画像データがある場合は渡す
+      const recordId = await CoffeeStorageService.saveCoffeeRecord(
+        coffeeRecord,
+        formData.imageData || undefined
+      );
+
+      // 保存成功のアラート
+      Alert.alert(
+        "保存成功",
+        `コーヒーレコードが保存されました。ID: ${recordId}`,
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              // 必要に応じてナビゲーションや画面のリセット
+              // navigation.goBack() など
+            },
+          },
+        ]
+      );
+
+      // フォームをリセット
+      resetForm();
+    } catch (error) {
+      // エラーハンドリング
+      Alert.alert(
+        "保存エラー",
+        "コーヒーレコードの保存中にエラーが発生しました。"
+      );
+      console.error("保存エラー:", error);
+    }
+  };
+
+  // フォームリセット関数
+  const resetForm = () => {
+    setFormData({
+      imageData: "",
+      beansName: "",
+      variety: "",
+      productionArea: "",
+      roastingDegree: "",
+      extractionMethod: "",
+      extractionMaker: "",
+      Grind: "",
+      temperature: 0,
+      dose: 0,
+      water: 0,
+      measuredTime: "",
+      acidity: 0,
+      bitter: 0,
+      sweet: 0,
+      rich: 0,
+      aroma: 0,
+      aftertaste: 0,
+      textArea: "",
+    });
+
+    setRangeValues({
+      acidity: 0,
+      bitter: 0,
+      sweet: 0,
+      rich: 0,
+      aroma: 0,
+      aftertaste: 0,
+    });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contents}>
@@ -197,6 +326,12 @@ export default function CreateScreen() {
             />
             <RadarChart data={rangeValues} />
             <TextAreaComponent onChange={handleTextAreaChange} />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmit}
+            >
+              <Text style={styles.submitButtonText}>保存</Text>
+            </TouchableOpacity>
           </ScrollView>
         </View>
       </View>
@@ -238,5 +373,18 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     marginTop: 10,
+  },
+  submitButton: {
+    backgroundColor: "#4A90E2",
+    padding: 15,
+    borderRadius: 10,
+    width: "90%",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

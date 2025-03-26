@@ -1,0 +1,28 @@
+// src/types/CoffeeTypes.ts
+export interface CoffeeRecord {
+  id: string; // 一意の識別子
+  name: string; // 名称
+  variety: string; // 品種
+  origin: string; // 産地
+  roastLevel: "Light" | "Medium" | "Dark" | "Espresso"; // 焙煎度
+  extractionMethod:
+    | "Drip"
+    | "Espresso"
+    | "French Press"
+    | "Pour Over"
+    | "Cold Brew"; // 抽出方法
+  extractionEquipment: string; // 抽出器具
+  grindSize: "Extra Fine" | "Fine" | "Medium" | "Coarse" | "Extra Coarse"; // 挽き目
+  temperature: number; // 温度（℃）
+  coffeeAmount: number; // 粉量（g）
+  waterAmount: number; // 湯量（g）
+  extractionTime: number; // 抽出時間
+  acidity: number; // 酸味（1-10）
+  bitterness: number; // 苦味（1-10）
+  sweetness: number; // 甘味（1-10）
+  body: number; // コク（1-10）
+  aroma: number; // 香り（1-10）
+  aftertaste: number; // 後味（1-10）
+  memo?: string; // メモ
+  imageUri?: string; // 画像のパス
+}
