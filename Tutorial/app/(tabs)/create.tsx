@@ -20,8 +20,8 @@ export default function CreateScreen() {
   });
   const [SelectLabel, setSelectLabel] = useState({
     roastingDegree: "焙煎度",
+    extractionMaker: "抽出メーカー",
     extractionMethod: "抽出方法",
-    extractionEquipment: "抽出器具",
     Grind: "挽き目",
   });
   const [RangeLabel, setRangeLabel] = useState({
@@ -66,7 +66,7 @@ export default function CreateScreen() {
             <InputComponent dataTitle={InputLabel.productionArea} />
             <SelectComponent dataTitle={SelectLabel.roastingDegree} />
             <SelectComponent dataTitle={SelectLabel.extractionMethod} />
-            <SelectComponent dataTitle={SelectLabel.extractionEquipment} />
+            <SelectComponent dataTitle={SelectLabel.extractionMaker} />
             <SelectComponent dataTitle={SelectLabel.Grind} />
 
             <NumberComponent dataTitle={NumberLabel.temperature} />

@@ -4,12 +4,56 @@ import { Picker } from "@react-native-picker/picker"; // Picker をインポー�
 
 const SelectComponent = (props: { dataTitle: string }) => {
   const [selectedMethod, setSelectedMethod] = useState("");
-  const methods = [
-    { label: "ハンドドリップ", value: "handdrip" },
-    { label: "フレンチプレス", value: "frenchpress" },
-    { label: "エスプレッソ", value: "espresso" },
-    { label: "水出し", value: "icedrip" },
-  ];
+  console.log(props.dataTitle);
+  const methods = () => {
+    if (props.dataTitle === "焙煎度") {
+      return [
+        { label: "ライトロースト (浅煎り)", value: "lightroast" },
+        { label: "シナモンロースト (浅煎り)", value: "cinnamonroast" },
+        { label: "ミディアムロースト (中浅煎り)", value: "mediumroast" },
+        { label: "ハイロースト (中煎り)", value: "highroast" },
+        { label: "シティロースト (中深煎り)", value: "cityroast" },
+        { label: "フルシティロースト (深煎り)", value: "fullcityroast" },
+        { label: "フレンチロースト (深煎り)", value: "frenchroast" },
+        { label: "イタリアンロースト (深煎り)", value: "italianroast" },
+      ];
+    } else if (props.dataTitle === "抽出方法") {
+      return [
+        { label: "ペーパードリップ", value: "paperdrip" },
+        { label: "ネルドリップ", value: "neldrip" },
+        { label: "金属フィルタードリップ", value: "metalfilterdrip" },
+        { label: "フレンチプレス", value: "frenchpress" },
+        { label: "エアロプレス", value: "aeropress" },
+        { label: "コーヒーメーカー (ドリップ式)", value: "coffeemakerdrip" },
+        { label: "サイフォン", value: "syphon" },
+        { label: "エスプレッソ", value: "espresso" },
+        { label: "モカポット抽出", value: "mokapotextraction" },
+        { label: "水出し", value: "icedrip" },
+      ];
+    } else if (props.dataTitle === "抽出メーカー") {
+      return [
+        { label: "ハリオ (Hario)", value: "hario" },
+        { label: "カリタ (Kalita)", value: "kalita" },
+        { label: "ケメックス (Chemex)", value: "chemex" },
+        { label: "エアロプレス (Aeropress)", value: "aeropress" },
+        { label: "ビアレッティ (Bialetti)", value: "bialetti" },
+        { label: "ボダム (Bodum)", value: "bodum" },
+        { label: "メリタ (Melitta)", value: "melitta" },
+        { label: "ORIGAMI", value: "origami" },
+        { label: "その他", value: "other" },
+      ];
+    } else if (props.dataTitle === "挽き目") {
+      return [
+        { label: "極細挽き", value: "extrafine" },
+        { label: "細挽き", value: "fine" },
+        { label: "中細挽き", value: "mediumfine" },
+        { label: "中挽き", value: "medium" },
+        { label: "粗挽き", value: "coarse" },
+        { label: "極粗挽き", value: "extracourse" },
+      ];
+    }
+    return []; // デフォルトで空の配列を返す
+  };
 
   return (
     <View style={styles.selectContainer}>
@@ -20,7 +64,7 @@ const SelectComponent = (props: { dataTitle: string }) => {
         style={styles.select} // スタイルはinputのまま
       >
         <Picker.Item label="選択してください" value="" />
-        {methods.map((method) => (
+        {methods().map((method) => (
           <Picker.Item
             key={method.value}
             label={method.label}
