@@ -3,7 +3,7 @@ import { Text, View, StyleSheet } from "react-native";
 import { Link } from "expo-router";
 import { IconButton } from "react-native-paper";
 import * as Font from "expo-font"; // expo-fontをインポート
-
+import "react-native-get-random-values";
 export default function Index() {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
