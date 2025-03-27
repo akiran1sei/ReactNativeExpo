@@ -9,7 +9,7 @@ const ImageUploadComponent: React.FC<ImagePickerProps> = ({
   onChange, // props を受け取る
 }) => {
   // デフォルト画像のURIを設定
-  const defaultImage = require("@/assets/images/no-image.png"); // デフォルト画像へのパスを適宜変更してください
+  const defaultImage = require("../assets/images/no-image.png"); // デフォルト画像へのパスを適宜変更してください
 
   const [image, setImage] = useState<string | null>(null);
 

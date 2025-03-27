@@ -8,17 +8,63 @@ import {
   Text,
   Alert,
 } from "react-native";
-import HeaderComponent from "@/components/HeaderComponent";
-import PageTitleComponent from "@/components/PageTitleComponent";
-import SelectComponent from "@/components/SelectComponent";
-import InputComponent from "@/components/InputComponent";
-import RangeComponent from "@/components/RangeComponent";
-import NumberComponent from "@/components/NumberComponent";
-import ImageUploadComponent from "@/components/ImageUploadComponent";
-import TextAreaComponent from "@/components/TextAreaComponent";
-import MeasuredTimeInputComponent from "@/components/MeasuredTimeInputComponent ";
-import RadarChart from "@/components/RadarChart/RadarChart";
-import CoffeeStorageService from "@/services/CoffeeStorageService"; // ストレージサービスをインポート
+import HeaderComponent from "../../components/HeaderComponent";
+import PageTitleComponent from "../../components/PageTitleComponent";
+import SelectComponent from "../../components/SelectComponent";
+import InputComponent from "../../components/InputComponent";
+import RangeComponent from "../../components/RangeComponent";
+import NumberComponent from "../../components/NumberComponent";
+import ImageUploadComponent from "../../components/ImageUploadComponent";
+import TextAreaComponent from "../../components/TextAreaComponent";
+import MeasuredTimeInputComponent from "../../components/MeasuredTimeInputComponent ";
+import RadarChart from "../../components/RadarChart/RadarChart";
+import CoffeeStorageService from "../../services/CoffeeStorageService"; // ストレージサービスをインポート
+
+interface CoffeeRecord {
+  id: string;
+  name: string;
+  variety: string;
+  origin: string;
+  roastLevel:
+    | "lightroast"
+    | "cinnamonroast"
+    | "mediumroast"
+    | "highroast"
+    | "cityroast"
+    | "fullcityroast"
+    | "frenchroast"
+    | "italianroast";
+  extractionMethod:
+    | "paperdrip"
+    | "neldrip"
+    | "metalfilterdrip"
+    | "frenchpress"
+    | "aeropress"
+    | "coffeemakerdrip"
+    | "syphon"
+    | "espresso"
+    | "mokapotextraction"
+    | "icedrip";
+  extractionMaker: string;
+  grindSize:
+    | "extrafine"
+    | "fine"
+    | "mediumfine"
+    | "medium"
+    | "coarse"
+    | "extracourse";
+  temperature: number;
+  coffeeAmount: number;
+  waterAmount: number;
+  extractionTime: number;
+  acidity: number;
+  bitterness: number;
+  sweetness: number;
+  body: number;
+  aroma: number;
+  aftertaste: number;
+  memo: string;
+}
 
 export default function CreateScreen() {
   const TextData = "Coffee Create"; // ページタイトルに表示するテキスト
@@ -103,21 +149,22 @@ export default function CreateScreen() {
     setImageData(value);
     setFormData({ ...formData, imageData: value }); // imageData の更新後に formData を更新
   };
+
   // 新しい送信ハンドラー
   const handleSubmit = async () => {
-    // 必須フィールドのバリデーション
-    const requiredFields = [
-      "beansName",
-      "variety",
-      "productionArea",
-      "roastingDegree",
-      "extractionMethod",
-    ];
+    // 型安全な方法で必須フィールドをチェック
+    const missingFields = (
+      Object.keys(formData) as Array<keyof typeof formData>
+    ).filter((field) => {
+      const value = formData[field];
+      return (
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        (typeof value === "number" && value === 0)
+      );
+    });
 
-    // const missingFields = requiredFields.filter((field) => !formData[field]);
-    const missingFields = requiredFields.filter(
-      (field) => !formData[field as keyof typeof formData]
-    );
     if (missingFields.length > 0) {
       Alert.alert(
         "入力エラー",
@@ -127,29 +174,121 @@ export default function CreateScreen() {
     }
 
     try {
-      // データ変換（CoffeeRecordの型に合わせる）
-      const coffeeRecord = {
+      // バリデーション関数の修正
+      function validateRoastLevel(
+        level: string
+      ):
+        | "lightroast"
+        | "cinnamonroast"
+        | "mediumroast"
+        | "highroast"
+        | "cityroast"
+        | "fullcityroast"
+        | "frenchroast"
+        | "italianroast" {
+        const validLevels = [
+          "lightroast",
+          "cinnamonroast",
+          "mediumroast",
+          "highroast",
+          "cityroast",
+          "fullcityroast",
+          "frenchroast",
+          "italianroast",
+        ];
+        if (!validLevels.includes(level)) {
+          throw new Error(`Invalid roast level: ${level}`);
+        }
+        return level as
+          | "lightroast"
+          | "cinnamonroast"
+          | "mediumroast"
+          | "highroast"
+          | "cityroast"
+          | "fullcityroast"
+          | "frenchroast"
+          | "italianroast";
+      }
+
+      function validateExtractionMethod(
+        method: string
+      ):
+        | "paperdrip"
+        | "neldrip"
+        | "metalfilterdrip"
+        | "frenchpress"
+        | "aeropress"
+        | "coffeemakerdrip"
+        | "syphon"
+        | "espresso"
+        | "mokapotextraction"
+        | "icedrip" {
+        const validMethods = [
+          "paperdrip",
+          "neldrip",
+          "metalfilterdrip",
+          "frenchpress",
+          "aeropress",
+          "coffeemakerdrip",
+          "syphon",
+          "espresso",
+          "mokapotextraction",
+          "icedrip",
+        ];
+        if (!validMethods.includes(method)) {
+          throw new Error(`Invalid extraction method: ${method}`);
+        }
+        return method as
+          | "paperdrip"
+          | "neldrip"
+          | "metalfilterdrip"
+          | "frenchpress"
+          | "aeropress"
+          | "coffeemakerdrip"
+          | "syphon"
+          | "espresso"
+          | "mokapotextraction"
+          | "icedrip";
+      }
+
+      function validateGrindSize(
+        size: string
+      ):
+        | "extrafine"
+        | "fine"
+        | "mediumfine"
+        | "medium"
+        | "coarse"
+        | "extracourse" {
+        const validSizes = [
+          "extrafine",
+          "fine",
+          "mediumfine",
+          "medium",
+          "coarse",
+          "extracourse",
+        ];
+        if (!validSizes.includes(size)) {
+          throw new Error(`Invalid grind size: ${size}`);
+        }
+        return size as
+          | "extrafine"
+          | "fine"
+          | "mediumfine"
+          | "medium"
+          | "coarse"
+          | "extracourse";
+      }
+
+      // 型安全な変換
+      const coffeeRecord: Omit<CoffeeRecord, "id"> = {
         name: formData.beansName,
         variety: formData.variety,
         origin: formData.productionArea,
-        roastLevel: formData.roastingDegree as
-          | "Light"
-          | "Medium"
-          | "Dark"
-          | "Espresso",
-        extractionMethod: formData.extractionMethod as
-          | "Drip"
-          | "Espresso"
-          | "French Press"
-          | "Pour Over"
-          | "Cold Brew",
-        extractionEquipment: formData.extractionMaker,
-        grindSize: formData.Grind as
-          | "Extra Fine"
-          | "Fine"
-          | "Medium"
-          | "Coarse"
-          | "Extra Coarse",
+        roastLevel: validateRoastLevel(formData.roastingDegree),
+        extractionMethod: validateExtractionMethod(formData.extractionMethod),
+        extractionMaker: formData.extractionMaker,
+        grindSize: validateGrindSize(formData.Grind),
         temperature: formData.temperature,
         coffeeAmount: formData.dose,
         waterAmount: formData.water,
@@ -163,13 +302,11 @@ export default function CreateScreen() {
         memo: formData.textArea,
       };
 
-      // 画像データがある場合は渡す
       const recordId = await CoffeeStorageService.saveCoffeeRecord(
         coffeeRecord,
         formData.imageData || undefined
       );
 
-      // 保存成功のアラート
       Alert.alert(
         "保存成功",
         `コーヒーレコードが保存されました。ID: ${recordId}`,
@@ -177,20 +314,18 @@ export default function CreateScreen() {
           {
             text: "OK",
             onPress: () => {
-              // 必要に応じてナビゲーションや画面のリセット
-              // navigation.goBack() など
+              // ナビゲーションや画面のリセット処理
+              resetForm();
             },
           },
         ]
       );
-
-      // フォームをリセット
-      resetForm();
     } catch (error) {
-      // エラーハンドリング
       Alert.alert(
         "保存エラー",
-        "コーヒーレコードの保存中にエラーが発生しました。"
+        error instanceof Error
+          ? error.message
+          : "コーヒーレコードの保存中にエラーが発生しました。"
       );
       console.error("保存エラー:", error);
     }

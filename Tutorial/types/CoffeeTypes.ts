@@ -4,15 +4,12 @@ export interface CoffeeRecord {
   name: string; // 名称
   variety: string; // 品種
   origin: string; // 産地
-  roastLevel: "Light" | "Medium" | "Dark" | "Espresso"; // 焙煎度
-  extractionMethod:
-    | "Drip"
-    | "Espresso"
-    | "French Press"
-    | "Pour Over"
-    | "Cold Brew"; // 抽出方法
-  extractionEquipment: string; // 抽出器具
-  grindSize: "Extra Fine" | "Fine" | "Medium" | "Coarse" | "Extra Coarse"; // 挽き目
+  roastLevel: string; // 焙煎度
+  extractionMethod: string;
+
+  extractionMaker: string;
+
+  grindSize: string; // 挽き目
   temperature: number; // 温度（℃）
   coffeeAmount: number; // 粉量（g）
   waterAmount: number; // 湯量（g）
