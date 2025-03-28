@@ -30,7 +30,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={styles.radarChartContainer}>
       <VictoryChart polar domain={{ y: [0, 5] }} theme={VictoryTheme.material}>
         <VictoryPolarAxis
           dependentAxis
@@ -45,8 +45,10 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  radarChartContainer: {
     flex: 1,
+    width: "100%",
+    height: "100%",
     justifyContent: "center",
     alignItems: "center",
   },
