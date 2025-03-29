@@ -4,9 +4,14 @@ import { Picker } from "@react-native-picker/picker"; // Picker をインポー�
 interface SelectProps {
   dataTitle: string;
   onChange: (value: string) => void;
+  value: string;
 }
-const SelectComponent: React.FC<SelectProps> = ({ dataTitle, onChange }) => {
-  const [selectedMethod, setSelectedMethod] = useState("");
+const SelectComponent: React.FC<SelectProps> = ({
+  dataTitle,
+  onChange,
+  value,
+}) => {
+  // const [selectedMethod, setSelectedMethod] = useState("");
   const methods = () => {
     if (dataTitle === "焙煎度") {
       return [
@@ -61,9 +66,8 @@ const SelectComponent: React.FC<SelectProps> = ({ dataTitle, onChange }) => {
     <View style={styles.selectContainer}>
       <Text style={styles.label}>{dataTitle}</Text>
       <Picker
-        selectedValue={selectedMethod}
+        selectedValue={value}
         onValueChange={(itemValue) => {
-          setSelectedMethod(itemValue);
           onChange(itemValue); // 選択された値を親コンポーネントに渡す
         }}
         style={styles.select}

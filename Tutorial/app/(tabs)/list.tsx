@@ -352,6 +352,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   mainContents: {
+    width: "100%",
+
+    marginHorizontal: "auto",
     top: 210,
     bottom: 0, // 画面の下部まで拡張
   },

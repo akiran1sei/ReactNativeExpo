@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import Slider from "@react-native-community/slider";
 import { FontAwesome } from "@expo/vector-icons";
@@ -6,23 +6,26 @@ import { FontAwesome } from "@expo/vector-icons";
 interface RangeComponentProps {
   dataTitle: string;
   onChange: (value: number) => void; // onChange プロパティを追加
+  value: number;
 }
 
 const RangeComponent: React.FC<RangeComponentProps> = ({
   dataTitle,
   onChange, // props を受け取る
+  value,
 }) => {
-  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderValue, setSliderValue] = useState(value);
 
+  useEffect(() => {
+    setSliderValue(value); // value が変更されたときに sliderValue を更新
+  }, [value]);
   const handleValueChange = (value: number) => {
-    setSliderValue(value);
     onChange(value); // 値が変更されたときに onChange を呼び出す
   };
 
   const incrementValue = () => {
     if (sliderValue + 0.5 <= 5) {
       const newValue = parseFloat((sliderValue + 0.5).toFixed(1));
-      setSliderValue(newValue);
       onChange(newValue); // 値が変更されたときに onChange を呼び出す
     }
   };
@@ -30,7 +33,6 @@ const RangeComponent: React.FC<RangeComponentProps> = ({
   const decrementValue = () => {
     if (sliderValue - 0.5 >= 0) {
       const newValue = parseFloat((sliderValue - 0.5).toFixed(1));
-      setSliderValue(newValue);
       onChange(newValue); // 値が変更されたときに onChange を呼び出す
     }
   };
@@ -48,7 +50,7 @@ const RangeComponent: React.FC<RangeComponentProps> = ({
             minimumValue={0}
             maximumValue={5}
             step={0.5}
-            value={sliderValue}
+            value={value} // value プロパティを使用
             onValueChange={handleValueChange}
             minimumTrackTintColor="#D2B48C"
             maximumTrackTintColor="#FFF"
@@ -58,7 +60,7 @@ const RangeComponent: React.FC<RangeComponentProps> = ({
             <FontAwesome name="plus" size={20} color="#D2B48C" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.valueText}>{sliderValue}</Text>
+        <Text style={styles.valueText}>{value}</Text>
       </View>
     </View>
   );

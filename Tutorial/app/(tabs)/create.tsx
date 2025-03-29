@@ -279,7 +279,39 @@ export default function CreateScreen() {
           | "coarse"
           | "extracourse";
       }
-
+      // フォームリセット関数
+      const resetForm = () => {
+        setImageData(null);
+        setFormData({
+          imageData: "",
+          beansName: "",
+          variety: "",
+          productionArea: "",
+          roastingDegree: "",
+          extractionMethod: "",
+          extractionMaker: "",
+          Grind: "",
+          temperature: 0,
+          dose: 0,
+          water: 0,
+          measuredTime: "",
+          acidity: 0,
+          bitter: 0,
+          sweet: 0,
+          rich: 0,
+          aroma: 0,
+          aftertaste: 0,
+          textArea: "",
+        });
+        setRangeValues({
+          acidity: 0,
+          bitter: 0,
+          sweet: 0,
+          rich: 0,
+          aroma: 0,
+          aftertaste: 0,
+        });
+      };
       // 型安全な変換
       const coffeeRecord: Omit<CoffeeRecord, "id"> = {
         name: formData.beansName,
@@ -331,39 +363,6 @@ export default function CreateScreen() {
     }
   };
 
-  // フォームリセット関数
-  const resetForm = () => {
-    setFormData({
-      imageData: "",
-      beansName: "",
-      variety: "",
-      productionArea: "",
-      roastingDegree: "",
-      extractionMethod: "",
-      extractionMaker: "",
-      Grind: "",
-      temperature: 0,
-      dose: 0,
-      water: 0,
-      measuredTime: "",
-      acidity: 0,
-      bitter: 0,
-      sweet: 0,
-      rich: 0,
-      aroma: 0,
-      aftertaste: 0,
-      textArea: "",
-    });
-
-    setRangeValues({
-      acidity: 0,
-      bitter: 0,
-      sweet: 0,
-      rich: 0,
-      aroma: 0,
-      aftertaste: 0,
-    });
-  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contents}>
@@ -376,91 +375,113 @@ export default function CreateScreen() {
             contentContainerStyle={styles.scrollContainer}
             showsVerticalScrollIndicator={true}
           >
-            {/* {imageData && (
-              <Image source={{ uri: imageData }} style={styles.preview} />
-            )} */}
-            <ImageUploadComponent onChange={handleImageChange} />
+            <ImageUploadComponent
+              onChange={handleImageChange}
+              value={imageData} // imageDataを渡す
+            />
             <InputComponent
               dataTitle={InputLabel.beansName}
               onChange={(value: string) =>
                 handleInputChange("beansName", value)
               }
+              value={formData.beansName} // 追加
             />
             <InputComponent
               dataTitle={InputLabel.variety}
               onChange={(value: string) => handleInputChange("variety", value)}
+              value={formData.variety} // 追加
             />
             <InputComponent
               dataTitle={InputLabel.productionArea}
               onChange={(value: string) =>
                 handleInputChange("productionArea", value)
               }
+              value={formData.productionArea} // 追加
             />
             <SelectComponent
               dataTitle={SelectLabel.roastingDegree}
               onChange={(value: string) =>
                 handleSelectChange("roastingDegree", value)
               }
+              value={formData.roastingDegree} // 追加
             />
             <SelectComponent
               dataTitle={SelectLabel.extractionMethod}
               onChange={(value: string) =>
                 handleSelectChange("extractionMethod", value)
               }
+              value={formData.extractionMethod} // 追加
             />
             <SelectComponent
               dataTitle={SelectLabel.extractionMaker}
               onChange={(value: string) =>
                 handleSelectChange("extractionMaker", value)
               }
+              value={formData.extractionMaker} // 追加
             />
             <SelectComponent
               dataTitle={SelectLabel.Grind}
               onChange={(value: string) => handleSelectChange("Grind", value)}
+              value={formData.Grind} // 追加
             />
             <NumberComponent
               dataTitle={NumberLabel.temperature}
               onChange={(value: number) =>
                 handleInputChange("temperature", value)
               }
+              value={formData.temperature} // 追加
             />
             <NumberComponent
               dataTitle={NumberLabel.dose}
               onChange={(value: number) => handleInputChange("dose", value)}
+              value={formData.dose} // 追加
             />
             <NumberComponent
               dataTitle={NumberLabel.water}
               onChange={(value: number) => handleInputChange("water", value)}
+              value={formData.water} // 追加
             />
-            <MeasuredTimeInputComponent onChange={handleMeasuredTimeChange} />
+            <MeasuredTimeInputComponent
+              onChange={handleMeasuredTimeChange}
+              value={formData.measuredTime} // 追加
+            />
             <RangeComponent
               dataTitle={RangeLabel.acidity}
               onChange={(value: number) => handleRangeChange("acidity", value)}
+              value={rangeValues.acidity} // 追加
             />
             <RangeComponent
               dataTitle={RangeLabel.bitter}
               onChange={(value: number) => handleRangeChange("bitter", value)}
+              value={rangeValues.bitter} // 追加
             />
             <RangeComponent
               dataTitle={RangeLabel.sweet}
               onChange={(value: number) => handleRangeChange("sweet", value)}
+              value={rangeValues.sweet} // 追加
             />
             <RangeComponent
               dataTitle={RangeLabel.rich}
               onChange={(value: number) => handleRangeChange("rich", value)}
+              value={rangeValues.rich} // 追加
             />
             <RangeComponent
               dataTitle={RangeLabel.aroma}
               onChange={(value: number) => handleRangeChange("aroma", value)}
+              value={rangeValues.aroma} // 追加
             />
             <RangeComponent
               dataTitle={RangeLabel.aftertaste}
               onChange={(value: number) =>
                 handleRangeChange("aftertaste", value)
               }
+              value={rangeValues.aftertaste} // 追加
             />
             <RadarChart data={rangeValues} />
-            <TextAreaComponent onChange={handleTextAreaChange} />
+            <TextAreaComponent
+              onChange={handleTextAreaChange}
+              value={formData.textArea} // 追加
+            />
             <TouchableOpacity
               style={styles.submitButton}
               onPress={handleSubmit}
@@ -492,6 +513,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   mainContents: {
+    width: "100%",
+    maxWidth: 500,
+    marginHorizontal: "auto",
     top: 210,
     bottom: 0, // 画面の下部まで拡張
   },
@@ -504,11 +528,7 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 18,
   },
-  preview: {
-    width: 200,
-    height: 200,
-    marginTop: 10,
-  },
+
   submitButton: {
     backgroundColor: "#4A90E2",
     padding: 15,

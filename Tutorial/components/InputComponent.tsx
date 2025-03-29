@@ -4,13 +4,17 @@ import { View, StyleSheet, TextInput, Text } from "react-native";
 interface InputProps {
   dataTitle: string;
   onChange: (value: string) => void;
+  value: string;
 }
 
-const InputComponent: React.FC<InputProps> = ({ dataTitle, onChange }) => {
-  const [inputText, setInputText] = useState("");
+const InputComponent: React.FC<InputProps> = ({
+  dataTitle,
+  onChange,
+  value,
+}) => {
+  // const [inputText, setInputText] = useState("");
 
   const handleInputChange = (text: string) => {
-    setInputText(text);
     onChange(text); // 親コンポーネントに値を渡す
   };
 
@@ -20,7 +24,7 @@ const InputComponent: React.FC<InputProps> = ({ dataTitle, onChange }) => {
       <TextInput
         style={styles.input}
         onChangeText={handleInputChange}
-        value={inputText}
+        value={value}
         placeholder="入力してください"
         placeholderTextColor="#D3D3D3"
       />

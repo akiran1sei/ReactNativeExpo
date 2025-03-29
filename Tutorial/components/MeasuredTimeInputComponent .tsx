@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -9,22 +9,34 @@ import {
 
 interface TimeInputProps {
   onChange: (value: string) => void;
+  value: string;
 }
 
-const MeasuredTimeInputComponent: React.FC<TimeInputProps> = ({ onChange }) => {
+const MeasuredTimeInputComponent: React.FC<TimeInputProps> = ({
+  onChange,
+  value,
+}) => {
   const [minutes, setMinutes] = useState<string>("");
   const [seconds, setSeconds] = useState<string>("");
 
   const minutesInput = useRef<TextInput>(null);
   const secondsInput = useRef<TextInput>(null);
 
+  useEffect(() => {
+    if (value) {
+      const [min, sec] = value.split(":");
+      setMinutes(min || "");
+      setSeconds(sec || "");
+    } else {
+      setMinutes("");
+      setSeconds("");
+    }
+  }, [value]);
   const handleMinutesChange = (text: string) => {
     const numericValue = parseInt(text.replace(/[^0-9]/g, ""), 10);
     if (isNaN(numericValue) || (numericValue >= 0 && numericValue <= 99)) {
       setMinutes(text.replace(/[^0-9]/g, ""));
-      if (seconds !== "") {
-        onChange(`${text.replace(/[^0-9]/g, "")}:${seconds}`);
-      }
+      onChange(`${text.replace(/[^0-9]/g, "")}:${seconds}`);
     }
   };
 
@@ -32,9 +44,7 @@ const MeasuredTimeInputComponent: React.FC<TimeInputProps> = ({ onChange }) => {
     const numericValue = parseInt(text.replace(/[^0-9]/g, ""), 10);
     if (isNaN(numericValue) || (numericValue >= 0 && numericValue <= 59)) {
       setSeconds(text.replace(/[^0-9]/g, ""));
-      if (minutes !== "") {
-        onChange(`${minutes}:${text.replace(/[^0-9]/g, "")}`);
-      }
+      onChange(`${minutes}:${text.replace(/[^0-9]/g, "")}`);
     }
   };
 
@@ -45,8 +55,6 @@ const MeasuredTimeInputComponent: React.FC<TimeInputProps> = ({ onChange }) => {
   };
 
   const resetTime = () => {
-    setMinutes("");
-    setSeconds("");
     onChange("");
     if (minutesInput.current) {
       minutesInput.current.focus();

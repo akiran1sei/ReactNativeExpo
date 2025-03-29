@@ -1,46 +1,93 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  Platform,
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
 interface ImagePickerProps {
   onChange: (value: string) => void;
+  value?: string | null; // Property to receive values from parent component for reset
 }
+
 const ImageUploadComponent: React.FC<ImagePickerProps> = ({
-  onChange, // props を受け取る
+  onChange,
+  value,
 }) => {
-  // デフォルト画像のURIを設定
-  const defaultImage = require("../assets/images/no-image.png"); // デフォルト画像へのパスを適宜変更してください
+  // Set default image URI
+  const defaultImage = require("../assets/images/no-image.png");
 
   const [image, setImage] = useState<string | null>(null);
 
+  // Update image state when value from parent component changes
+  useEffect(() => {
+    setImage(value || null);
+  }, [value]);
+
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    // Check if running on web
+    if (Platform.OS === "web") {
+      // Use HTML input for web
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
 
-    if (status !== "granted") {
-      alert("画像を選択するには、カメラロールへのアクセス許可が必要です。");
-      return;
-    }
+      input.onchange = (e: any) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          const reader = new FileReader();
 
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
+          reader.onload = (loadEvent) => {
+            const dataUrl = loadEvent.target?.result as string;
+            setImage(dataUrl);
+            onChange(dataUrl);
+          };
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const selectedUri = result.assets[0].uri;
-        setImage(selectedUri);
-        onChange(selectedUri); // 選択された画像の URI を親コンポーネントに送信
+          reader.readAsDataURL(file);
+        }
+      };
+
+      // Trigger click on input element
+      input.click();
+    } else {
+      // Original mobile implementation
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== "granted") {
+        alert("画像を選択するには、カメラロールへのアクセス許可が必要です。");
+        return;
       }
-    } catch (error) {
-      console.error("画像の選択中にエラーが発生しました:", error);
-      alert("画像の選択中にエラーが発生しました。");
+
+      try {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+          const selectedUri = result.assets[0].uri;
+          setImage(selectedUri);
+          onChange(selectedUri);
+        }
+      } catch (error) {
+        console.error("画像の選択中にエラーが発生しました:", error);
+        alert("画像の選択中にエラーが発生しました。");
+      }
     }
   };
 
-  // 画像ソースを決定（ユーザーが選択した画像またはデフォルト画像）
-  const imageSource = image ? { uri: image } : defaultImage;
+  // Determine image source (user-selected image or default image)
+  const imageSource = image
+    ? Platform.OS === "web"
+      ? { uri: image }
+      : { uri: image }
+    : defaultImage;
 
   return (
     <View style={styles.uploadContainer}>
@@ -61,12 +108,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#D2B48C",
     borderRadius: 10,
     padding: 10,
-    marginBottom: 10, // 下マージンを追加
+    marginBottom: 10,
+    alignSelf: "center", // Center the container
   },
   imageContents: {
-    width: "90%", // 幅を90%に設定
-    marginBottom: 10, // 下マージンを追加
-    marginHorizontal: "auto", // 左右マージンをautoに設定
+    width: "90%",
+    marginBottom: 10,
+    alignSelf: "center", // Center the contents
   },
   imageButton: {
     width: "100%",
@@ -83,9 +131,10 @@ const styles = StyleSheet.create({
   },
   imagePreview: {
     width: "100%",
-    height: 200,
+    height: 250,
     borderRadius: 10,
-    backgroundColor: "#F0F0F0", // デフォルト画像がない場合の背景色
+    backgroundColor: "#F0F0F0",
+    resizeMode: "contain", // Ensure image is properly displayed
   },
 });
 

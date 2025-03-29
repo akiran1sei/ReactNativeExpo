@@ -1,4 +1,4 @@
-// src/services/CoffeeStorageService.ts
+import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CoffeeRecord } from "../types/CoffeeTypes";
 import * as FileSystem from "expo-file-system";
@@ -6,6 +6,34 @@ import { v4 as uuidv4 } from "uuid";
 
 class CoffeeStorageService {
   private STORAGE_KEY = "@CoffeeRecords";
+  private isWeb = Platform.OS === "web";
+
+  // Web環境用のストレージヘルパー
+  private async webSaveData(key: string, data: any): Promise<void> {
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+      console.error("Webストレージ保存エラー:", error);
+      throw error;
+    }
+  }
+
+  private async webGetData(key: string): Promise<any> {
+    try {
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error("Webストレージ取得エラー:", error);
+      return null;
+    }
+  }
+
+  // Web環境での画像保存（Base64として）
+  private async webSaveImage(imageUri: string): Promise<string> {
+    // Web環境ではBase64文字列として保存するのみ
+    // 実際のURLまたはBase64文字列をそのまま返す
+    return imageUri;
+  }
 
   // 新しいコーヒーレコードを保存
   async saveCoffeeRecord(
@@ -19,7 +47,11 @@ class CoffeeStorageService {
       // 画像がある場合は処理
       let processedImageUri = imageUri;
       if (imageUri) {
-        processedImageUri = await this.saveImage(imageUri, id);
+        if (this.isWeb) {
+          processedImageUri = await this.webSaveImage(imageUri);
+        } else {
+          processedImageUri = await this.saveImage(imageUri, id);
+        }
       }
 
       // 完全なレコードを作成
@@ -30,19 +62,32 @@ class CoffeeStorageService {
       };
 
       // 既存のレコードを取得
-      const existingRecordsJson = await AsyncStorage.getItem(this.STORAGE_KEY);
-      const existingRecords: CoffeeRecord[] = existingRecordsJson
-        ? JSON.parse(existingRecordsJson)
-        : [];
+      let existingRecords: CoffeeRecord[] = [];
+
+      if (this.isWeb) {
+        const existingRecordsJson = await this.webGetData(this.STORAGE_KEY);
+        existingRecords = existingRecordsJson || [];
+      } else {
+        const existingRecordsJson = await AsyncStorage.getItem(
+          this.STORAGE_KEY
+        );
+        existingRecords = existingRecordsJson
+          ? JSON.parse(existingRecordsJson)
+          : [];
+      }
 
       // 新しいレコードを追加
       const updatedRecords = [...existingRecords, fullRecord];
 
       // 更新されたレコードを保存
-      await AsyncStorage.setItem(
-        this.STORAGE_KEY,
-        JSON.stringify(updatedRecords)
-      );
+      if (this.isWeb) {
+        await this.webSaveData(this.STORAGE_KEY, updatedRecords);
+      } else {
+        await AsyncStorage.setItem(
+          this.STORAGE_KEY,
+          JSON.stringify(updatedRecords)
+        );
+      }
 
       return id;
     } catch (error) {
@@ -51,7 +96,7 @@ class CoffeeStorageService {
     }
   }
 
-  // 画像をアプリのファイルシステムに保存
+  // 画像をアプリのファイルシステムに保存 (モバイル環境用)
   private async saveImage(
     sourceUri: string,
     recordId: string
@@ -73,8 +118,13 @@ class CoffeeStorageService {
   // すべてのコーヒーレコードを取得
   async getAllCoffeeRecords(): Promise<CoffeeRecord[]> {
     try {
-      const recordsJson = await AsyncStorage.getItem(this.STORAGE_KEY);
-      return recordsJson ? JSON.parse(recordsJson) : [];
+      if (this.isWeb) {
+        const records = await this.webGetData(this.STORAGE_KEY);
+        return records || [];
+      } else {
+        const recordsJson = await AsyncStorage.getItem(this.STORAGE_KEY);
+        return recordsJson ? JSON.parse(recordsJson) : [];
+      }
     } catch (error) {
       console.error("コーヒーレコードの取得中にエラーが発生しました:", error);
       return [];
@@ -103,7 +153,12 @@ class CoffeeStorageService {
 
       if (index !== -1) {
         records[index] = { ...records[index], ...updatedRecord };
-        await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
+
+        if (this.isWeb) {
+          await this.webSaveData(this.STORAGE_KEY, records);
+        } else {
+          await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(records));
+        }
         return true;
       }
       return false;
@@ -117,20 +172,24 @@ class CoffeeStorageService {
   async deleteCoffeeRecord(id: string): Promise<boolean> {
     try {
       const records = await this.getAllCoffeeRecords();
+      const recordToDelete = records.find((record) => record.id === id);
       const filteredRecords = records.filter((record) => record.id !== id);
 
-      // 関連する画像があれば削除
-      const recordToDelete = records.find((record) => record.id === id);
-      if (recordToDelete?.imageUri) {
+      // 関連する画像があれば削除（モバイル環境のみ）
+      if (!this.isWeb && recordToDelete?.imageUri) {
         await FileSystem.deleteAsync(recordToDelete.imageUri, {
           idempotent: true,
         });
       }
 
-      await AsyncStorage.setItem(
-        this.STORAGE_KEY,
-        JSON.stringify(filteredRecords)
-      );
+      if (this.isWeb) {
+        await this.webSaveData(this.STORAGE_KEY, filteredRecords);
+      } else {
+        await AsyncStorage.setItem(
+          this.STORAGE_KEY,
+          JSON.stringify(filteredRecords)
+        );
+      }
       return true;
     } catch (error) {
       console.error("コーヒーレコードの削除中にエラーが発生しました:", error);

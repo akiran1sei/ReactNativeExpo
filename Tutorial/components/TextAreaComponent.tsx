@@ -3,13 +3,11 @@ import { View, StyleSheet, TextInput, Text } from "react-native";
 
 interface TextAreaProps {
   onChange: (value: string) => void;
+  value: string;
 }
 
-const TextAreaComponent: React.FC<TextAreaProps> = ({ onChange }) => {
-  const [inputText, setInputText] = useState("");
-
+const TextAreaComponent: React.FC<TextAreaProps> = ({ onChange, value }) => {
   const handleInputChange = (text: string) => {
-    setInputText(text);
     onChange(text); // 親コンポーネントに値を渡す
   };
 
@@ -19,7 +17,7 @@ const TextAreaComponent: React.FC<TextAreaProps> = ({ onChange }) => {
       <TextInput
         style={styles.textarea}
         onChangeText={handleInputChange}
-        value={inputText}
+        value={value} // value プロパティを使用
         placeholder="入力してください"
         placeholderTextColor="#D3D3D3"
         multiline={true}

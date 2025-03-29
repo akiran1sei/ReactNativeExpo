@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text, TextInput } from "react-native";
 interface NumberProps {
   dataTitle: string;
   onChange: (value: number) => void;
+  value: number;
 }
-const NumberComponent: React.FC<NumberProps> = ({ dataTitle, onChange }) => {
-  const [inputValue, setInputValue] = useState("0"); // 初期値を文字列"0"とする
+const NumberComponent: React.FC<NumberProps> = ({
+  dataTitle,
+  onChange,
+  value,
+}) => {
+  const [inputValue, setInputValue] = useState(value.toString()); // 初期値を文字列とする
   const [isFocused, setIsFocused] = useState(false);
-
+  useEffect(() => {
+    setInputValue(value.toString()); // value が変更されたときに inputValue を更新
+  }, [value]);
   const handleInputChange = (text: string) => {
     const filteredText = text.replace(/[^0-9]/g, "");
     setInputValue(filteredText);
@@ -37,7 +44,7 @@ const NumberComponent: React.FC<NumberProps> = ({ dataTitle, onChange }) => {
 
       <TextInput
         style={[styles.numberInput, isFocused && styles.focusedInput]}
-        value={inputValue}
+        value={inputValue} // value プロパティを使用
         onChangeText={handleInputChange}
         keyboardType="number-pad"
         onBlur={handleBlur}
