@@ -1,52 +1,135 @@
 import React, { useState, useEffect } from "react";
-import { Text, ScrollView, View, Image, StyleSheet } from "react-native";
+import {
+  Text,
+  ScrollView,
+  View,
+  Image,
+  StyleSheet,
+  Platform,
+  ImageSourcePropType,
+  RefreshControl,
+  TouchableOpacity, // TouchableOpacity をインポート
+  Alert, // Alert をインポート
+} from "react-native";
 
 import HeaderComponent from "../../components/HeaderComponent";
 import PageTitleComponent from "../../components/PageTitleComponent";
 import CoffeeStorageService from "../../services/CoffeeStorageService";
-import { CoffeeRecord } from "../../types/CoffeeTypes"; // CoffeeRecordの型定義をインポート
+import { CoffeeRecord } from "../../types/CoffeeTypes";
 import RadarChart from "../../components/RadarChart/RadarChart";
 
 export default function ListScreen() {
-  const [coffeeRecords, setCoffeeRecords] = useState<CoffeeRecord[]>([]); // 型を明示的に指定
+  const [coffeeRecords, setCoffeeRecords] = useState<CoffeeRecord[]>([]);
 
-  const [rangeValues, setRangeValues] = useState({
+  const [selectedRecord, setSelectedRecord] = useState<CoffeeRecord | null>(
+    null
+  );
+
+  // Define default range values
+  const defaultRangeValues = {
     acidity: 5,
     bitter: 5,
     sweet: 5,
     rich: 5,
     aroma: 5,
     aftertaste: 5,
-  });
+  };
+
+  const [rangeValues, setRangeValues] = useState(defaultRangeValues);
+  const [refreshing, setRefreshing] = useState(false); // リフレッシュ状態を管理
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const records = await CoffeeStorageService.getAllCoffeeRecords();
-        setCoffeeRecords(records);
-        await rangePreview(); // 関数を呼び出す
-      } catch (error) {
-        console.error("データの取得に失敗しました:", error);
-      }
-    };
     fetchData();
   }, []);
+  const fetchData = async () => {
+    try {
+      const records = await CoffeeStorageService.getAllCoffeeRecords();
+      setCoffeeRecords(records);
 
-  async function rangePreview() {
-    // async 関数として定義
-    coffeeRecords.map((record) =>
-      setRangeValues({
-        ...rangeValues,
-        acidity: Number(record.acidity),
-        bitter: Number(record.bitterness),
-        sweet: Number(record.sweetness),
-        rich: Number(record.body),
-        aroma: Number(record.aroma),
-        aftertaste: Number(record.aftertaste),
-      })
-    );
-  }
+      // Select the first record if available
+      if (records.length > 0) {
+        setSelectedRecord(records[0]);
+        updateRangeValues(records[0]);
+      }
+    } catch (error) {
+      console.error("データの取得に失敗しました:", error);
+    }
+  };
+  const handleRefresh = async () => {
+    setRefreshing(true); // リフレッシュ開始
+    await fetchData(); // データ再取得
+    setRefreshing(false); // リフレッシュ終了
+  };
+  // Update range values based on a coffee record
+  const updateRangeValues = (record: CoffeeRecord) => {
+    setRangeValues({
+      acidity: Number(record.acidity) || 0,
+      bitter: Number(record.bitterness) || 0,
+      sweet: Number(record.sweetness) || 0,
+      rich: Number(record.body) || 0,
+      aroma: Number(record.aroma) || 0,
+      aftertaste: Number(record.aftertaste) || 0,
+    });
+  };
+  // 画像URIを環境に応じて適切に処理する関数 - Fixed return type
+  const getImageSource = (uri?: string | null): ImageSourcePropType => {
+    if (!uri) {
+      return require("../../assets/images/no-image.png");
+    }
 
-  const TextData = "Coffee List"; // ��ージタイトルに表示するテキスト
+    if (Platform.OS === "web") {
+      // Base64形式かどうかをチェック
+      if (uri.startsWith("data:image")) {
+        return { uri };
+      }
+      // web環境でfileプロトコルは使用できないため、デフォルトの画像を表示する。
+      return require("../../assets/images/no-image.png");
+    } else {
+      // モバイル環境の場合
+      return { uri: uri.startsWith("file://") ? uri : `file://${uri}` };
+    }
+  };
+
+  const handleDeleteRecord = async (id: string) => {
+    if (Platform.OS === "web") {
+      // Web環境の場合、window.confirm を使用
+      if (window.confirm("このレコードを削除しますか？")) {
+        try {
+          await CoffeeStorageService.deleteCoffeeRecord(id);
+          await fetchData();
+        } catch (error) {
+          console.error("レコードの削除に失敗しました:", error);
+        }
+      }
+    } else {
+      // モバイル環境の場合、Alert.alert を使用
+      Alert.alert(
+        "削除確認",
+        "このレコードを削除しますか？",
+        [
+          {
+            text: "キャンセル",
+            style: "cancel",
+          },
+          {
+            text: "削除",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                await CoffeeStorageService.deleteCoffeeRecord(id);
+                await fetchData();
+              } catch (error) {
+                console.error("レコードの削除に失敗しました:", error);
+              }
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
+  const TextData = "Coffee List"; // ページタイトルに表示するテキスト
 
   return (
     <View style={styles.container}>
@@ -55,7 +138,15 @@ export default function ListScreen() {
         <HeaderComponent />
         <PageTitleComponent TextData={TextData} />
         <View style={[styles.absoluteBox, styles.mainContents]}>
-          <ScrollView style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+              />
+            }
+          >
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={true}
@@ -70,9 +161,11 @@ export default function ListScreen() {
                       >
                         画像
                       </Text>
+                      {/* 画像表示部分 */}
                       <Image
-                        source={{ uri: `file://${record.imageUri}` }}
+                        source={getImageSource(record.imageUri)}
                         style={styles.recordImagePreview}
+                        defaultSource={require("../../assets/images/no-image.png")} // Optional fallback
                       />
                     </View>
                     <View style={styles.nameContainer}>
@@ -302,12 +395,12 @@ export default function ListScreen() {
                       <View style={styles.recordRadarChart}>
                         <RadarChart
                           data={{
-                            acidity: Number(record.acidity),
-                            bitter: Number(record.bitterness),
-                            sweet: Number(record.sweetness),
-                            rich: Number(record.body),
-                            aroma: Number(record.aroma),
-                            aftertaste: Number(record.aftertaste),
+                            acidity: Number(record.acidity) || 0,
+                            bitter: Number(record.bitterness) || 0,
+                            sweet: Number(record.sweetness) || 0,
+                            rich: Number(record.body) || 0,
+                            aroma: Number(record.aroma) || 0,
+                            aftertaste: Number(record.aftertaste) || 0,
                           }}
                         />
                       </View>
@@ -322,6 +415,12 @@ export default function ListScreen() {
                         {record.memo}
                       </Text>
                     </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => handleDeleteRecord(record.id)}
+                    >
+                      <Text style={styles.deleteButtonText}>削除</Text>
+                    </TouchableOpacity>
                   </View>
                 ))}
               </View>
@@ -353,7 +452,6 @@ const styles = StyleSheet.create({
   },
   mainContents: {
     width: "100%",
-
     marginHorizontal: "auto",
     top: 210,
     bottom: 0, // 画面の下部まで拡張
@@ -366,7 +464,6 @@ const styles = StyleSheet.create({
   innerScrollContainer: {
     flexDirection: "row", // 子要素を横方向に配置
   },
-
   recordContainer: {
     flex: 1,
     flexDirection: "row",
@@ -388,13 +485,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#F0F0F0", // デフォルト画像がない場合の背景色
   },
   recordRadarChart: { margin: 20, width: "auto", height: "auto" },
-
   labelText: {
     color: "#D2B48C",
     paddingVertical: 10,
     textAlign: "center",
   },
   valueText: { textAlign: "center" },
+  deleteButton: {
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignSelf: "center",
+  },
+  deleteButtonText: {
+    color: "white",
+    textAlign: "center",
+  },
   imageUriContainer: {},
   nameContainer: {},
   varietyContainer: {},
@@ -472,7 +579,7 @@ const styles = StyleSheet.create({
     // aftertaste スタイル
   },
   radarChart: {
-    // aftertaste スタイル
+    // radarChart スタイル
   },
   memo: {
     // memo スタイル

@@ -68,7 +68,7 @@ interface CoffeeRecord {
 
 export default function CreateScreen() {
   const TextData = "Coffee Create"; // ページタイトルに表示するテキスト
-
+  const [resetKey, setResetKey] = useState(0); // 追加
   const [InputLabel, setInputLabel] = useState({
     beansName: "名称",
     variety: "品種",
@@ -311,6 +311,7 @@ export default function CreateScreen() {
           aroma: 0,
           aftertaste: 0,
         });
+        setResetKey((prevKey) => prevKey + 1); // 追加
       };
       // 型安全な変換
       const coffeeRecord: Omit<CoffeeRecord, "id"> = {
@@ -376,111 +377,130 @@ export default function CreateScreen() {
             showsVerticalScrollIndicator={true}
           >
             <ImageUploadComponent
+              key={`imageUpload-${resetKey}`} // 追加
               onChange={handleImageChange}
-              value={imageData} // imageDataを渡す
+              value={imageData}
             />
             <InputComponent
+              key={`beansName-${resetKey}`} // 追加
               dataTitle={InputLabel.beansName}
               onChange={(value: string) =>
                 handleInputChange("beansName", value)
               }
-              value={formData.beansName} // 追加
+              value={formData.beansName}
             />
             <InputComponent
+              key={`variety-${resetKey}`} // 追加
               dataTitle={InputLabel.variety}
               onChange={(value: string) => handleInputChange("variety", value)}
-              value={formData.variety} // 追加
+              value={formData.variety}
             />
             <InputComponent
+              key={`productionArea-${resetKey}`} // 追加
               dataTitle={InputLabel.productionArea}
               onChange={(value: string) =>
                 handleInputChange("productionArea", value)
               }
-              value={formData.productionArea} // 追加
+              value={formData.productionArea}
             />
             <SelectComponent
+              key={`roastingDegree-${resetKey}`} // 追加
               dataTitle={SelectLabel.roastingDegree}
               onChange={(value: string) =>
                 handleSelectChange("roastingDegree", value)
               }
-              value={formData.roastingDegree} // 追加
+              value={formData.roastingDegree}
             />
             <SelectComponent
+              key={`extractionMethod-${resetKey}`} // 追加
               dataTitle={SelectLabel.extractionMethod}
               onChange={(value: string) =>
                 handleSelectChange("extractionMethod", value)
               }
-              value={formData.extractionMethod} // 追加
+              value={formData.extractionMethod}
             />
             <SelectComponent
+              key={`extractionMaker-${resetKey}`} // 追加
               dataTitle={SelectLabel.extractionMaker}
               onChange={(value: string) =>
                 handleSelectChange("extractionMaker", value)
               }
-              value={formData.extractionMaker} // 追加
+              value={formData.extractionMaker}
             />
             <SelectComponent
+              key={`Grind-${resetKey}`} // 追加
               dataTitle={SelectLabel.Grind}
               onChange={(value: string) => handleSelectChange("Grind", value)}
-              value={formData.Grind} // 追加
+              value={formData.Grind}
             />
             <NumberComponent
+              key={`temperature-${resetKey}`} // 追加
               dataTitle={NumberLabel.temperature}
               onChange={(value: number) =>
                 handleInputChange("temperature", value)
               }
-              value={formData.temperature} // 追加
+              value={formData.temperature}
             />
             <NumberComponent
+              key={`dose-${resetKey}`} // 追加
               dataTitle={NumberLabel.dose}
               onChange={(value: number) => handleInputChange("dose", value)}
-              value={formData.dose} // 追加
+              value={formData.dose}
             />
             <NumberComponent
+              key={`water-${resetKey}`} // 追加
               dataTitle={NumberLabel.water}
               onChange={(value: number) => handleInputChange("water", value)}
-              value={formData.water} // 追加
+              value={formData.water}
             />
             <MeasuredTimeInputComponent
+              key={`measuredTime-${resetKey}`} // 追加
               onChange={handleMeasuredTimeChange}
-              value={formData.measuredTime} // 追加
+              value={formData.measuredTime}
             />
             <RangeComponent
+              key={`acidity-${resetKey}`} // 追加
               dataTitle={RangeLabel.acidity}
               onChange={(value: number) => handleRangeChange("acidity", value)}
-              value={rangeValues.acidity} // 追加
+              value={rangeValues.acidity}
             />
             <RangeComponent
+              key={`bitter-${resetKey}`} // 追加
               dataTitle={RangeLabel.bitter}
               onChange={(value: number) => handleRangeChange("bitter", value)}
-              value={rangeValues.bitter} // 追加
+              value={rangeValues.bitter}
             />
             <RangeComponent
+              key={`sweet-${resetKey}`} // 追加
               dataTitle={RangeLabel.sweet}
               onChange={(value: number) => handleRangeChange("sweet", value)}
-              value={rangeValues.sweet} // 追加
+              value={rangeValues.sweet}
             />
             <RangeComponent
+              key={`rich-${resetKey}`} // 追加
               dataTitle={RangeLabel.rich}
               onChange={(value: number) => handleRangeChange("rich", value)}
-              value={rangeValues.rich} // 追加
+              value={rangeValues.rich}
             />
             <RangeComponent
+              key={`aroma-${resetKey}`} // 追加
               dataTitle={RangeLabel.aroma}
               onChange={(value: number) => handleRangeChange("aroma", value)}
-              value={rangeValues.aroma} // 追加
+              value={rangeValues.aroma}
             />
             <RangeComponent
+              key={`aftertaste-${resetKey}`} // 追加
               dataTitle={RangeLabel.aftertaste}
               onChange={(value: number) =>
                 handleRangeChange("aftertaste", value)
               }
-              value={rangeValues.aftertaste} // 追加
+              value={rangeValues.aftertaste}
             />
             <RadarChart data={rangeValues} />
             <TextAreaComponent
+              key={`textArea-${resetKey}`} // 追加
               onChange={handleTextAreaChange}
-              value={formData.textArea} // 追加
+              value={formData.textArea}
             />
             <TouchableOpacity
               style={styles.submitButton}

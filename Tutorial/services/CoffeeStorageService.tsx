@@ -28,13 +28,17 @@ class CoffeeStorageService {
     }
   }
 
-  // Web環境での画像保存（Base64として）
+  // Web環境での画像保存の改善
   private async webSaveImage(imageUri: string): Promise<string> {
-    // Web環境ではBase64文字列として保存するのみ
-    // 実際のURLまたはBase64文字列をそのまま返す
+    // Base64形式かどうかをチェック
+    if (imageUri.startsWith("data:image")) {
+      // Base64形式の画像はそのまま返す
+      return imageUri;
+    }
+
+    // Web環境ではBase64またはURLをそのまま保存
     return imageUri;
   }
-
   // 新しいコーヒーレコードを保存
   async saveCoffeeRecord(
     record: Omit<CoffeeRecord, "id">,
@@ -45,7 +49,7 @@ class CoffeeStorageService {
       const id = uuidv4();
 
       // 画像がある場合は処理
-      let processedImageUri = imageUri;
+      let processedImageUri = null;
       if (imageUri) {
         if (this.isWeb) {
           processedImageUri = await this.webSaveImage(imageUri);
@@ -60,7 +64,6 @@ class CoffeeStorageService {
         ...record,
         imageUri: processedImageUri,
       };
-
       // 既存のレコードを取得
       let existingRecords: CoffeeRecord[] = [];
 
