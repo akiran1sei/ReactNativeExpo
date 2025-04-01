@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   Alert,
+  Platform,
 } from "react-native";
 import HeaderComponent from "../../components/HeaderComponent";
 import PageTitleComponent from "../../components/PageTitleComponent";
@@ -65,10 +66,42 @@ interface CoffeeRecord {
   aftertaste: number;
   memo: string;
 }
+// 初期状態を定数として定義
+const initialFormData = {
+  imageData: "",
+  beansName: "",
+  variety: "",
+  productionArea: "",
+  roastingDegree: "",
+  extractionMethod: "",
+  extractionMaker: "",
+  Grind: "",
+  temperature: 0,
+  dose: 0,
+  water: 0,
+  measuredTime: "",
+  acidity: 0,
+  bitter: 0,
+  sweet: 0,
+  rich: 0,
+  aroma: 0,
+  aftertaste: 0,
+  textArea: "",
+};
 
+const initialRangeValues = {
+  acidity: 0,
+  bitter: 0,
+  sweet: 0,
+  rich: 0,
+  aroma: 0,
+  aftertaste: 0,
+};
 export default function CreateScreen() {
   const TextData = "Coffee Create"; // ページタイトルに表示するテキスト
-  const [resetKey, setResetKey] = useState(0); // 追加
+  const [resetKey, setResetKey] = useState(0);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isWeb] = useState(Platform.OS === "web");
   const [InputLabel, setInputLabel] = useState({
     beansName: "名称",
     variety: "品種",
@@ -95,36 +128,26 @@ export default function CreateScreen() {
   });
 
   const [imageData, setImageData] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    imageData: "",
-    beansName: "",
-    variety: "",
-    productionArea: "",
-    roastingDegree: "",
-    extractionMethod: "",
-    extractionMaker: "",
-    Grind: "",
-    temperature: 0,
-    dose: 0,
-    water: 0,
-    measuredTime: "",
-    acidity: 0,
-    bitter: 0,
-    sweet: 0,
-    rich: 0,
-    aroma: 0,
-    aftertaste: 0,
-    textArea: "",
-  });
-
-  const [rangeValues, setRangeValues] = useState({
-    acidity: 0,
-    bitter: 0,
-    sweet: 0,
-    rich: 0,
-    aroma: 0,
-    aftertaste: 0,
-  });
+  const [formData, setFormData] = useState({ ...initialFormData });
+  const [rangeValues, setRangeValues] = useState({ ...initialRangeValues });
+  // Web環境でフォーム送信後の状態をリセット
+  useEffect(() => {
+    if (formSubmitted && isWeb) {
+      // 短い遅延後にフォームをリセット
+      const timer = setTimeout(() => {
+        setFormSubmitted(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [formSubmitted, isWeb]);
+  // フォームリセット関数
+  const resetForm = useCallback(() => {
+    setImageData(null);
+    setFormData({ ...initialFormData });
+    setRangeValues({ ...initialRangeValues });
+    setResetKey((prevKey) => prevKey + 1);
+    setFormSubmitted(true);
+  }, []);
   const handleInputChange = (label: string, value: string | number) => {
     setFormData({ ...formData, [label]: value });
   };
@@ -166,10 +189,18 @@ export default function CreateScreen() {
     });
 
     if (missingFields.length > 0) {
-      Alert.alert(
-        "入力エラー",
-        `以下の必須項目が未入力です：\n${missingFields.join(", ")}`
-      );
+      if (isWeb) {
+        alert(
+          `入力エラー\n以下の必須項目が未入力です：\n${missingFields.join(
+            ", "
+          )}`
+        );
+      } else {
+        Alert.alert(
+          "入力エラー",
+          `以下の必須項目が未入力です：\n${missingFields.join(", ")}`
+        );
+      }
       return;
     }
 
@@ -279,40 +310,7 @@ export default function CreateScreen() {
           | "coarse"
           | "extracourse";
       }
-      // フォームリセット関数
-      const resetForm = () => {
-        setImageData(null);
-        setFormData({
-          imageData: "",
-          beansName: "",
-          variety: "",
-          productionArea: "",
-          roastingDegree: "",
-          extractionMethod: "",
-          extractionMaker: "",
-          Grind: "",
-          temperature: 0,
-          dose: 0,
-          water: 0,
-          measuredTime: "",
-          acidity: 0,
-          bitter: 0,
-          sweet: 0,
-          rich: 0,
-          aroma: 0,
-          aftertaste: 0,
-          textArea: "",
-        });
-        setRangeValues({
-          acidity: 0,
-          bitter: 0,
-          sweet: 0,
-          rich: 0,
-          aroma: 0,
-          aftertaste: 0,
-        });
-        setResetKey((prevKey) => prevKey + 1); // 追加
-      };
+
       // 型安全な変換
       const coffeeRecord: Omit<CoffeeRecord, "id"> = {
         name: formData.beansName,
@@ -340,30 +338,44 @@ export default function CreateScreen() {
         formData.imageData || undefined
       );
 
-      Alert.alert(
+      showWebAlert(
         "保存成功",
         `コーヒーレコードが保存されました。ID: ${recordId}`,
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              // ナビゲーションや画面のリセット処理
-              resetForm();
-            },
-          },
-        ]
+        resetForm
       );
     } catch (error) {
-      Alert.alert(
-        "保存エラー",
-        error instanceof Error
-          ? error.message
-          : "コーヒーレコードの保存中にエラーが発生しました。"
-      );
+      if (isWeb) {
+        alert(
+          `保存エラー\n${
+            error instanceof Error
+              ? error.message
+              : "コーヒーレコードの保存中にエラーが発生しました。"
+          }`
+        );
+      } else {
+        Alert.alert(
+          "保存エラー",
+          error instanceof Error
+            ? error.message
+            : "コーヒーレコードの保存中にエラーが発生しました。"
+        );
+      }
       console.error("保存エラー:", error);
     }
   };
-
+  // Web向けのアラートコンポーネント
+  const showWebAlert = (
+    title: string,
+    message: string,
+    onConfirm: () => void
+  ) => {
+    if (isWeb) {
+      alert(`${title}\n${message}`);
+      onConfirm();
+    } else {
+      Alert.alert(title, message, [{ text: "OK", onPress: onConfirm }]);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contents}>
@@ -508,6 +520,14 @@ export default function CreateScreen() {
             >
               <Text style={styles.submitButtonText}>保存</Text>
             </TouchableOpacity>
+
+            {isWeb && (
+              <View style={styles.statusIndicator}>
+                <Text style={styles.statusText}>
+                  {formSubmitted ? "保存成功！" : ""}
+                </Text>
+              </View>
+            )}
           </ScrollView>
         </View>
       </View>
@@ -561,5 +581,15 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  statusIndicator: {
+    marginTop: 15,
+    padding: 10,
+    alignItems: "center",
+  },
+  statusText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#4CAF50",
   },
 });
