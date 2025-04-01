@@ -159,8 +159,19 @@ export default function ListScreen() {
                       pathname: "/coffee-item",
                       params: { id: record.id },
                     }}
+                    key={record.id}
                   >
-                    <View key={record.id} style={styles.recordItem}>
+                    <View style={styles.recordItem}>
+                      <View style={styles.nameContainer}>
+                        <Text
+                          style={[styles.text, styles.labelText, styles.name]}
+                        >
+                          コーヒー豆
+                        </Text>
+                        <Text style={[styles.text, styles.valueText]}>
+                          {record.name}
+                        </Text>
+                      </View>
                       <View style={styles.imageUriContainer}>
                         <Text
                           style={[
@@ -177,16 +188,6 @@ export default function ListScreen() {
                           style={styles.recordImagePreview}
                           defaultSource={require("../../assets/images/no-image.png")} // Optional fallback
                         />
-                      </View>
-                      <View style={styles.nameContainer}>
-                        <Text
-                          style={[styles.text, styles.labelText, styles.name]}
-                        >
-                          コーヒー豆
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.name}
-                        </Text>
                       </View>
                       <View style={styles.varietyContainer}>
                         <Text
@@ -324,6 +325,7 @@ export default function ListScreen() {
                           {record.extractionTime}
                         </Text>
                       </View>
+
                       <View style={styles.acidityContainer}>
                         <Text
                           style={[
@@ -470,10 +472,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   mainContents: {
+    flex: 1, // flex: 1 を追加
     width: "100%",
     marginHorizontal: "auto",
     top: 210,
-    bottom: 0, // 画面の下部まで拡張
+    bottom: 0,
   },
   scrollContainer: {
     alignItems: "center", // 子要素を中央揃え
@@ -494,6 +497,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: "auto",
     marginHorizontal: 20,
+    flexDirection: "column",
     textAlign: "center",
   },
   recordImagePreview: {

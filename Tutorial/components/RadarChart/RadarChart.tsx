@@ -35,8 +35,8 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
         polar
         domain={{ y: [0, 5] }}
         theme={VictoryTheme.material}
-        width={undefined} // width を undefined に設定
-        height={undefined} // height を undefined に設定
+        width={300} // width を undefined に設定
+        height={300} // height を undefined に設定
       >
         <VictoryPolarAxis
           dependentAxis
@@ -52,10 +52,8 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
 
 const styles = StyleSheet.create({
   radarChartContainer: {
-    flex: 1, // 親コンテナのサイズをフレキシブルに調整
-    flexDirection: "row",
-    width: 300,
-    height: 300,
+    width: "100%",
+    height: "auto",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
