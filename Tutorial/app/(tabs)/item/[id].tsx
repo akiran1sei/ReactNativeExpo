@@ -11,13 +11,13 @@ import {
   Text,
   Alert,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { Link, useRoute } from "@react-navigation/native";
 import { useRouter } from "expo-router"; // useRouter をインポート
-import HeaderComponent from "../../components/HeaderComponent";
-import PageTitleComponent from "../../components/PageTitleComponent";
-import CoffeeStorageService from "../../services/CoffeeStorageService";
-import { CoffeeRecord } from "../../types/CoffeeTypes";
-import RadarChart from "../../components/RadarChart/RadarChart";
+import HeaderComponent from "../../../components/HeaderComponent";
+import PageTitleComponent from "../../../components/PageTitleComponent";
+import CoffeeStorageService from "../../../services/CoffeeStorageService";
+import { CoffeeRecord } from "../../../types/CoffeeTypes";
+import RadarChart from "../../../components/RadarChart/RadarChart";
 
 type RouteParams = {
   id: string;
@@ -33,7 +33,7 @@ export default function CoffeeItemScreen() {
   // 画像URIを環境に応じて適切に処理する関数 - Fixed return type
   const getImageSource = (uri?: string | null): ImageSourcePropType => {
     if (!uri) {
-      return require("../../assets/images/no-image.png");
+      return require("../../../assets/images/no-image.png");
     }
 
     if (Platform.OS === "web") {
@@ -42,7 +42,7 @@ export default function CoffeeItemScreen() {
         return { uri };
       }
       // web環境でfileプロトコルは使用できないため、デフォルトの画像を表示する。
-      return require("../../assets/images/no-image.png");
+      return require("../../../assets/images/no-image.png");
     } else {
       // モバイル環境の場合
       return { uri: uri.startsWith("file://") ? uri : `file://${uri}` };
@@ -132,7 +132,7 @@ export default function CoffeeItemScreen() {
               <Image
                 source={getImageSource(coffeeRecord.imageUri)}
                 style={styles.recordImagePreview}
-                defaultSource={require("../../assets/images/no-image.png")} // Optional fallback
+                defaultSource={require("../../../assets/images/no-image.png")} // Optional fallback
               />
             </View>
 
@@ -144,20 +144,24 @@ export default function CoffeeItemScreen() {
                 {coffeeRecord.variety}
               </Text>
             </View>
-            <View style={styles.originContainer}>
-              <Text style={[styles.text, styles.labelText, styles.origin]}>
+            <View style={styles.productionAreaContainer}>
+              <Text
+                style={[styles.text, styles.labelText, styles.productionArea]}
+              >
                 産地
               </Text>
               <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.origin}
+                {coffeeRecord.productionArea}
               </Text>
             </View>
-            <View style={styles.roastLevelContainer}>
-              <Text style={[styles.text, styles.labelText, styles.roastLevel]}>
+            <View style={styles.roastingDegreeContainer}>
+              <Text
+                style={[styles.text, styles.labelText, styles.roastingDegree]}
+              >
                 焙煎度
               </Text>
               <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.roastLevel}
+                {coffeeRecord.roastingDegree}
               </Text>
             </View>
             <View style={styles.extractionMethodContainer}>
@@ -280,9 +284,9 @@ export default function CoffeeItemScreen() {
                 <RadarChart
                   data={{
                     acidity: Number(coffeeRecord.acidity) || 0,
-                    bitter: Number(coffeeRecord.bitterness) || 0,
-                    sweet: Number(coffeeRecord.sweetness) || 0,
-                    rich: Number(coffeeRecord.body) || 0,
+                    bitterness: Number(coffeeRecord.bitterness) || 0,
+                    sweetness: Number(coffeeRecord.sweetness) || 0,
+                    body: Number(coffeeRecord.body) || 0,
                     aroma: Number(coffeeRecord.aroma) || 0,
                     aftertaste: Number(coffeeRecord.aftertaste) || 0,
                   }}
@@ -297,6 +301,14 @@ export default function CoffeeItemScreen() {
                 {coffeeRecord.memo}
               </Text>
             </View>
+            <TouchableOpacity
+              style={styles.updateButton}
+              onPress={() =>
+                router.push({ pathname: `../update/${coffeeRecord.id}` })
+              }
+            >
+              <Text style={styles.updateButtonText}>編集</Text>
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => handleDeleteRecord(coffeeRecord.id)}
@@ -356,8 +368,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   varietyContainer: {},
-  originContainer: {},
-  roastLevelContainer: {},
+  productionAreaContainer: {},
+  roastingDegreeContainer: {},
   extractionMethodContainer: {},
   extractionMakerContainer: {},
   grindSizeContainer: {},
@@ -391,10 +403,20 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
-
+  updateButton: {
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignSelf: "center",
+  },
+  updateButtonText: {
+    color: "white",
+    textAlign: "center",
+  },
   variety: {},
-  origin: {},
-  roastLevel: {},
+  productionArea: {},
+  roastingDegree: {},
   extractionMethod: {},
   extractionMaker: {},
   grindSize: {},

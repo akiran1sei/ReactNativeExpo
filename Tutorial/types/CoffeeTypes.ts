@@ -3,8 +3,8 @@ export interface CoffeeRecord {
   id: string; // 一意の識別子
   name: string; // 名称
   variety: string; // 品種
-  origin: string; // 産地
-  roastLevel: string; // 焙煎度
+  productionArea: string; // 産地
+  roastingDegree: string; // 焙煎度
   extractionMethod: string;
 
   extractionMaker: string;
@@ -13,7 +13,7 @@ export interface CoffeeRecord {
   temperature: number; // 温度（℃）
   coffeeAmount: number; // 粉量（g）
   waterAmount: number; // 湯量（g）
-  extractionTime: number; // 抽出時間
+  extractionTime: string | number; // 抽出時間
   acidity: string | number; // 酸味（1-10）
   bitterness: string | number; // 苦味（1-10）
   sweetness: string | number; // 甘味（1-10）

@@ -25,8 +25,8 @@ interface CoffeeRecord {
   id: string;
   name: string;
   variety: string;
-  origin: string;
-  roastLevel:
+  productionArea: string;
+  roastingDegree:
     | "lightroast"
     | "cinnamonroast"
     | "mediumroast"
@@ -68,22 +68,22 @@ interface CoffeeRecord {
 }
 // 初期状態を定数として定義
 const initialFormData = {
-  imageData: "",
+  imageUri: "",
   beansName: "",
   variety: "",
   productionArea: "",
   roastingDegree: "",
   extractionMethod: "",
   extractionMaker: "",
-  Grind: "",
+  grindSize: "",
   temperature: 0,
-  dose: 0,
-  water: 0,
-  measuredTime: "",
+  coffeeAmount: 0,
+  waterAmount: 0,
+  extractionTime: "",
   acidity: 0,
-  bitter: 0,
-  sweet: 0,
-  rich: 0,
+  bitterness: 0,
+  sweetness: 0,
+  body: 0,
   aroma: 0,
   aftertaste: 0,
   textArea: "",
@@ -91,9 +91,9 @@ const initialFormData = {
 
 const initialRangeValues = {
   acidity: 0,
-  bitter: 0,
-  sweet: 0,
-  rich: 0,
+  bitterness: 0,
+  sweetness: 0,
+  body: 0,
   aroma: 0,
   aftertaste: 0,
 };
@@ -111,20 +111,20 @@ export default function CreateScreen() {
     roastingDegree: "焙煎度",
     extractionMaker: "抽出メーカー",
     extractionMethod: "抽出方法",
-    Grind: "挽き目",
+    grindSize: "挽き目",
   });
   const [RangeLabel, setRangeLabel] = useState({
     acidity: "酸味",
-    bitter: "苦味",
-    sweet: "甘味",
-    rich: "コク",
+    bitterness: "苦味",
+    sweetness: "甘味",
+    body: "コク",
     aroma: "香り",
     aftertaste: "後味",
   });
   const [NumberLabel, setNumberLabel] = useState({
     temperature: "温度（℃）",
-    dose: "紛量（g）",
-    water: "湯量（g）",
+    coffeeAmount: "紛量（g）",
+    waterAmount: "湯量（g）",
   });
 
   const [imageData, setImageData] = useState<string | null>(null);
@@ -166,11 +166,11 @@ export default function CreateScreen() {
   };
 
   const handleMeasuredTimeChange = (value: string) => {
-    setFormData({ ...formData, measuredTime: value });
+    setFormData({ ...formData, extractionTime: value });
   };
   const handleImageChange = (value: string) => {
     setImageData(value);
-    setFormData({ ...formData, imageData: value }); // imageData の更新後に formData を更新
+    setFormData({ ...formData, imageUri: value }); // imageData の更新後に formData を更新
   };
 
   // 新しい送信ハンドラー
@@ -206,7 +206,7 @@ export default function CreateScreen() {
 
     try {
       // バリデーション関数の修正
-      function validateRoastLevel(
+      function validateRoastingDegree(
         level: string
       ):
         | "lightroast"
@@ -315,19 +315,19 @@ export default function CreateScreen() {
       const coffeeRecord: Omit<CoffeeRecord, "id"> = {
         name: formData.beansName,
         variety: formData.variety,
-        origin: formData.productionArea,
-        roastLevel: validateRoastLevel(formData.roastingDegree),
+        productionArea: formData.productionArea,
+        roastingDegree: validateRoastingDegree(formData.roastingDegree),
         extractionMethod: validateExtractionMethod(formData.extractionMethod),
         extractionMaker: formData.extractionMaker,
-        grindSize: validateGrindSize(formData.Grind),
+        grindSize: validateGrindSize(formData.grindSize),
         temperature: formData.temperature,
-        coffeeAmount: formData.dose,
-        waterAmount: formData.water,
-        extractionTime: parseFloat(formData.measuredTime) || 0,
+        coffeeAmount: formData.coffeeAmount,
+        waterAmount: formData.waterAmount,
+        extractionTime: parseFloat(formData.extractionTime) || 0,
         acidity: formData.acidity,
-        bitterness: formData.bitter,
-        sweetness: formData.sweet,
-        body: formData.rich,
+        bitterness: formData.bitterness,
+        sweetness: formData.sweetness,
+        body: formData.body,
         aroma: formData.aroma,
         aftertaste: formData.aftertaste,
         memo: formData.textArea,
@@ -335,7 +335,7 @@ export default function CreateScreen() {
 
       const recordId = await CoffeeStorageService.saveCoffeeRecord(
         coffeeRecord,
-        formData.imageData || undefined
+        formData.imageUri || undefined
       );
 
       showWebAlert(
@@ -440,10 +440,12 @@ export default function CreateScreen() {
               value={formData.extractionMaker}
             />
             <SelectComponent
-              key={`Grind-${resetKey}`} // 追加
-              dataTitle={SelectLabel.Grind}
-              onChange={(value: string) => handleSelectChange("Grind", value)}
-              value={formData.Grind}
+              key={`grindSize-${resetKey}`} // 追加
+              dataTitle={SelectLabel.grindSize}
+              onChange={(value: string) =>
+                handleSelectChange("grindSize", value)
+              }
+              value={formData.grindSize}
             />
             <NumberComponent
               key={`temperature-${resetKey}`} // 追加
@@ -454,21 +456,25 @@ export default function CreateScreen() {
               value={formData.temperature}
             />
             <NumberComponent
-              key={`dose-${resetKey}`} // 追加
-              dataTitle={NumberLabel.dose}
-              onChange={(value: number) => handleInputChange("dose", value)}
-              value={formData.dose}
+              key={`coffeeAmount-${resetKey}`} // 追加
+              dataTitle={NumberLabel.coffeeAmount}
+              onChange={(value: number) =>
+                handleInputChange("coffeeAmount", value)
+              }
+              value={formData.coffeeAmount}
             />
             <NumberComponent
-              key={`water-${resetKey}`} // 追加
-              dataTitle={NumberLabel.water}
-              onChange={(value: number) => handleInputChange("water", value)}
-              value={formData.water}
+              key={`waterAmount-${resetKey}`} // 追加
+              dataTitle={NumberLabel.waterAmount}
+              onChange={(value: number) =>
+                handleInputChange("waterAmount", value)
+              }
+              value={formData.waterAmount}
             />
             <MeasuredTimeInputComponent
-              key={`measuredTime-${resetKey}`} // 追加
+              key={`extractionTime-${resetKey}`} // 追加
               onChange={handleMeasuredTimeChange}
-              value={formData.measuredTime}
+              value={formData.extractionTime}
             />
             <RangeComponent
               key={`acidity-${resetKey}`} // 追加
@@ -477,22 +483,26 @@ export default function CreateScreen() {
               value={rangeValues.acidity}
             />
             <RangeComponent
-              key={`bitter-${resetKey}`} // 追加
-              dataTitle={RangeLabel.bitter}
-              onChange={(value: number) => handleRangeChange("bitter", value)}
-              value={rangeValues.bitter}
+              key={`bitterness-${resetKey}`} // 追加
+              dataTitle={RangeLabel.bitterness}
+              onChange={(value: number) =>
+                handleRangeChange("bitterness", value)
+              }
+              value={rangeValues.bitterness}
             />
             <RangeComponent
-              key={`sweet-${resetKey}`} // 追加
-              dataTitle={RangeLabel.sweet}
-              onChange={(value: number) => handleRangeChange("sweet", value)}
-              value={rangeValues.sweet}
+              key={`sweetness-${resetKey}`} // 追加
+              dataTitle={RangeLabel.sweetness}
+              onChange={(value: number) =>
+                handleRangeChange("sweetness", value)
+              }
+              value={rangeValues.sweetness}
             />
             <RangeComponent
-              key={`rich-${resetKey}`} // 追加
-              dataTitle={RangeLabel.rich}
-              onChange={(value: number) => handleRangeChange("rich", value)}
-              value={rangeValues.rich}
+              key={`body-${resetKey}`} // 追加
+              dataTitle={RangeLabel.body}
+              onChange={(value: number) => handleRangeChange("body", value)}
+              value={rangeValues.body}
             />
             <RangeComponent
               key={`aroma-${resetKey}`} // 追加

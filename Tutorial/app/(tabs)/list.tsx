@@ -11,7 +11,7 @@ import {
   TouchableOpacity, // TouchableOpacity をインポート
   Alert, // Alert をインポート
 } from "react-native";
-import { Link } from "expo-router"; // Linkをインポート
+import { useRouter } from "expo-router";
 import HeaderComponent from "../../components/HeaderComponent";
 import PageTitleComponent from "../../components/PageTitleComponent";
 import CoffeeStorageService from "../../services/CoffeeStorageService";
@@ -19,6 +19,7 @@ import { CoffeeRecord } from "../../types/CoffeeTypes";
 import RadarChart from "../../components/RadarChart/RadarChart";
 
 export default function ListScreen() {
+  const router = useRouter();
   const [coffeeRecords, setCoffeeRecords] = useState<CoffeeRecord[]>([]);
 
   const [selectedRecord, setSelectedRecord] = useState<CoffeeRecord | null>(
@@ -154,12 +155,11 @@ export default function ListScreen() {
             >
               <View style={styles.recordContainer}>
                 {coffeeRecords.map((record) => (
-                  <Link
-                    href={{
-                      pathname: "/coffee-item",
-                      params: { id: record.id },
-                    }}
+                  <TouchableOpacity
                     key={record.id}
+                    onPress={() =>
+                      router.push({ pathname: `./item/${record.id}` })
+                    }
                   >
                     <View style={styles.recordItem}>
                       <View style={styles.nameContainer}>
@@ -203,28 +203,32 @@ export default function ListScreen() {
                           {record.variety}
                         </Text>
                       </View>
-                      <View style={styles.originContainer}>
-                        <Text
-                          style={[styles.text, styles.labelText, styles.origin]}
-                        >
-                          産地
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.origin}
-                        </Text>
-                      </View>
-                      <View style={styles.roastLevelContainer}>
+                      <View style={styles.productionAreaContainer}>
                         <Text
                           style={[
                             styles.text,
                             styles.labelText,
-                            styles.roastLevel,
+                            styles.productionArea,
+                          ]}
+                        >
+                          産地
+                        </Text>
+                        <Text style={[styles.text, styles.valueText]}>
+                          {record.productionArea}
+                        </Text>
+                      </View>
+                      <View style={styles.roastingDegreeContainer}>
+                        <Text
+                          style={[
+                            styles.text,
+                            styles.labelText,
+                            styles.roastingDegree,
                           ]}
                         >
                           焙煎度
                         </Text>
                         <Text style={[styles.text, styles.valueText]}>
-                          {record.roastLevel}
+                          {record.roastingDegree}
                         </Text>
                       </View>
                       <View style={styles.extractionMethodContainer}>
@@ -416,9 +420,9 @@ export default function ListScreen() {
                           <RadarChart
                             data={{
                               acidity: Number(record.acidity) || 0,
-                              bitter: Number(record.bitterness) || 0,
-                              sweet: Number(record.sweetness) || 0,
-                              rich: Number(record.body) || 0,
+                              bitterness: Number(record.bitterness) || 0,
+                              sweetness: Number(record.sweetness) || 0,
+                              body: Number(record.body) || 0,
                               aroma: Number(record.aroma) || 0,
                               aftertaste: Number(record.aftertaste) || 0,
                             }}
@@ -442,7 +446,7 @@ export default function ListScreen() {
                         <Text style={styles.deleteButtonText}>削除</Text>
                       </TouchableOpacity>
                     </View>
-                  </Link>
+                  </TouchableOpacity>
                 ))}
               </View>
             </ScrollView>
@@ -528,8 +532,8 @@ const styles = StyleSheet.create({
   imageUriContainer: {},
   nameContainer: {},
   varietyContainer: {},
-  originContainer: {},
-  roastLevelContainer: {},
+  productionAreaContainer: {},
+  roastingDegreeContainer: {},
   extractionMethodContainer: {},
   extractionMakerContainer: {},
   grindSizeContainer: {},
@@ -556,11 +560,11 @@ const styles = StyleSheet.create({
   variety: {
     // variety スタイル
   },
-  origin: {
-    // origin スタイル
+  productionArea: {
+    // productionArea スタイル
   },
-  roastLevel: {
-    // roastLevel スタイル
+  roastingDegree: {
+    // roastingDegree スタイル
   },
   extractionMethod: {
     // extractionMethod スタイル

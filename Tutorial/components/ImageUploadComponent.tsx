@@ -54,7 +54,7 @@ const ImageUploadComponent: React.FC<ImagePickerProps> = ({
       // Trigger click on input element
       input.click();
     } else {
-      // Original mobile implementation
+      // productionAreaal mobile implementation
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
 

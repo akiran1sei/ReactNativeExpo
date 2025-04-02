@@ -10,9 +10,9 @@ import {
 interface RadarChartProps {
   data: {
     acidity: number;
-    bitter: number;
-    sweet: number;
-    rich: number;
+    bitterness: number;
+    sweetness: number;
+    body: number;
     aroma: number;
     aftertaste: number;
   };
@@ -21,9 +21,9 @@ interface RadarChartProps {
 const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
   const chartData = [
     { x: "酸味", y: data.acidity },
-    { x: "苦味", y: data.bitter },
-    { x: "甘味", y: data.sweet },
-    { x: "コク", y: data.rich },
+    { x: "苦味", y: data.bitterness },
+    { x: "甘味", y: data.sweetness },
+    { x: "コク", y: data.body },
     { x: "香り", y: data.aroma },
     { x: "後味", y: data.aftertaste },
     { x: "酸味", y: data.acidity },
