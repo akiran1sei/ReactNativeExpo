@@ -12,11 +12,11 @@ import {
   Alert,
 } from "react-native";
 import { Link, useRoute } from "@react-navigation/native";
-import { useRouter } from "expo-router"; // useRouter をインポート
+import { useRouter } from "expo-router";
 import HeaderComponent from "../../../components/HeaderComponent";
 import PageTitleComponent from "../../../components/PageTitleComponent";
 import CoffeeStorageService from "../../../services/CoffeeStorageService";
-// import { CoffeeRecord } from "../../../types/CoffeeTypes";
+import { CoffeeRecord } from "../../../types/CoffeeTypes";
 import SelectComponent from "../../../components/SelectComponent";
 import InputComponent from "../../../components/InputComponent";
 import RangeComponent from "../../../components/RangeComponent";
@@ -29,58 +29,13 @@ import RadarChart from "../../../components/RadarChart/RadarChart";
 type RouteParams = {
   id: string;
 };
-interface CoffeeRecord {
-  imageUri: string;
-  id: string;
-  name: string;
-  variety: string;
-  productionArea: string;
-  roastingDegree:
-    | "lightroast"
-    | "cinnamonroast"
-    | "mediumroast"
-    | "highroast"
-    | "cityroast"
-    | "fullcityroast"
-    | "frenchroast"
-    | "italianroast";
-  extractionMethod:
-    | "paperdrip"
-    | "neldrip"
-    | "metalfilterdrip"
-    | "frenchpress"
-    | "aeropress"
-    | "coffeemakerdrip"
-    | "syphon"
-    | "espresso"
-    | "mokapotextraction"
-    | "icedrip";
-  extractionMaker: string;
-  grindSize:
-    | "extrafine"
-    | "fine"
-    | "mediumfine"
-    | "medium"
-    | "coarse"
-    | "extracourse";
-  temperature: number;
-  coffeeAmount: number;
-  waterAmount: number;
-  extractionTime: number;
-  acidity: number;
-  bitterness: number;
-  sweetness: number;
-  body: number;
-  aroma: number;
-  aftertaste: number;
-  memo: string;
-}
+
 export default function CoffeeItemScreen() {
   const route = useRoute();
   const router = useRouter();
   const { id } = route.params as RouteParams;
   const [InputLabel, setInputLabel] = useState({
-    beansName: "名称",
+    name: "名称",
     variety: "品種",
     productionArea: "産地",
   });
@@ -108,14 +63,16 @@ export default function CoffeeItemScreen() {
   const [imageData, setImageData] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<CoffeeRecord>>({});
   const [rangeValues, setRangeValues] = useState<Partial<CoffeeRecord>>({});
-  // 画像URIを環境に応じて適切に処理する関数 - Fixed return type
+  const [updating, setUpdating] = useState(false);
 
   const handleInputChange = (label: string, value: string | number) => {
+    // 空の文字列も有効な値として扱う
     setFormData({ ...formData, [label]: value });
   };
+
   const handleImageChange = (value: string) => {
     setImageData(value);
-    setFormData({ ...formData, imageUri: value }); // imageData の更新後に formData を更新
+    setFormData({ ...formData, imageUri: value });
   };
 
   const handleSelectChange = (label: string, value: string) => {
@@ -124,7 +81,10 @@ export default function CoffeeItemScreen() {
 
   const handleRangeChange = (label: string, value: number) => {
     setFormData({ ...formData, [label]: value });
-    setRangeValues({ ...rangeValues, [label]: value });
+    setRangeValues({
+      ...rangeValues,
+      [label]: value,
+    });
   };
 
   const handleTextAreaChange = (value: string) => {
@@ -134,6 +94,148 @@ export default function CoffeeItemScreen() {
   const handleMeasuredTimeChange = (value: string) => {
     setFormData({ ...formData, extractionTime: value });
   };
+
+  // Update coffee record function
+  const handleUpdateRecord = async () => {
+    setUpdating(true);
+    try {
+      // formDataの値を優先し、未定義の場合のみcoffeeRecordの値を使用
+      const updateData: Partial<CoffeeRecord> = {
+        name: formData.name !== undefined ? formData.name : coffeeRecord?.name,
+        variety:
+          formData.variety !== undefined
+            ? formData.variety
+            : coffeeRecord?.variety,
+        productionArea:
+          formData.productionArea !== undefined
+            ? formData.productionArea
+            : coffeeRecord?.productionArea,
+        roastingDegree:
+          formData.roastingDegree !== undefined
+            ? formData.roastingDegree
+            : coffeeRecord?.roastingDegree,
+        extractionMethod:
+          formData.extractionMethod !== undefined
+            ? formData.extractionMethod
+            : coffeeRecord?.extractionMethod,
+        extractionMaker:
+          formData.extractionMaker !== undefined
+            ? formData.extractionMaker
+            : coffeeRecord?.extractionMaker,
+        grindSize:
+          formData.grindSize !== undefined
+            ? formData.grindSize
+            : coffeeRecord?.grindSize,
+        temperature:
+          formData.temperature !== undefined
+            ? formData.temperature
+            : coffeeRecord?.temperature,
+        coffeeAmount:
+          formData.coffeeAmount !== undefined
+            ? formData.coffeeAmount
+            : coffeeRecord?.coffeeAmount,
+        waterAmount:
+          formData.waterAmount !== undefined
+            ? formData.waterAmount
+            : coffeeRecord?.waterAmount,
+        extractionTime:
+          formData.extractionTime !== undefined
+            ? formData.extractionTime
+            : coffeeRecord?.extractionTime,
+        acidity:
+          formData.acidity !== undefined
+            ? formData.acidity
+            : coffeeRecord?.acidity,
+        bitterness:
+          formData.bitterness !== undefined
+            ? formData.bitterness
+            : coffeeRecord?.bitterness,
+        sweetness:
+          formData.sweetness !== undefined
+            ? formData.sweetness
+            : coffeeRecord?.sweetness,
+        body: formData.body !== undefined ? formData.body : coffeeRecord?.body,
+        aroma:
+          formData.aroma !== undefined ? formData.aroma : coffeeRecord?.aroma,
+        aftertaste:
+          formData.aftertaste !== undefined
+            ? formData.aftertaste
+            : coffeeRecord?.aftertaste,
+        memo: formData.memo !== undefined ? formData.memo : coffeeRecord?.memo,
+        imageUri:
+          formData.imageUri !== undefined
+            ? formData.imageUri
+            : coffeeRecord?.imageUri,
+      };
+
+      const success = await CoffeeStorageService.updateCoffeeRecord(
+        id,
+        updateData
+      );
+
+      if (success) {
+        if (Platform.OS === "web") {
+          alert("コーヒーレコードが更新されました！");
+        } else {
+          Alert.alert("成功", "コーヒーレコードが更新されました！");
+        }
+        // Refresh data
+        const updatedRecord = await CoffeeStorageService.getCoffeeRecordById(
+          id
+        );
+        if (updatedRecord) {
+          setCoffeeRecord(updatedRecord);
+          // 更新された値をformDataにも反映
+          setFormData({
+            name: updatedRecord.name,
+            variety: updatedRecord.variety,
+            productionArea: updatedRecord.productionArea,
+            roastingDegree: updatedRecord.roastingDegree,
+            extractionMethod: updatedRecord.extractionMethod,
+            extractionMaker: updatedRecord.extractionMaker,
+            grindSize: updatedRecord.grindSize,
+            temperature: updatedRecord.temperature,
+            coffeeAmount: updatedRecord.coffeeAmount,
+            waterAmount: updatedRecord.waterAmount,
+            extractionTime: updatedRecord.extractionTime,
+            acidity: updatedRecord.acidity,
+            bitterness: updatedRecord.bitterness,
+            sweetness: updatedRecord.sweetness,
+            body: updatedRecord.body,
+            aroma: updatedRecord.aroma,
+            aftertaste: updatedRecord.aftertaste,
+            memo: updatedRecord.memo,
+            imageUri: updatedRecord.imageUri,
+          });
+
+          setRangeValues({
+            acidity: updatedRecord.acidity,
+            bitterness: updatedRecord.bitterness,
+            sweetness: updatedRecord.sweetness,
+            body: updatedRecord.body,
+            aroma: updatedRecord.aroma,
+            aftertaste: updatedRecord.aftertaste,
+          });
+        }
+      } else {
+        if (Platform.OS === "web") {
+          alert("更新に失敗しました。もう一度お試しください。");
+        } else {
+          Alert.alert("エラー", "更新に失敗しました。もう一度お試しください。");
+        }
+      }
+    } catch (error) {
+      console.error("レコードの更新に失敗しました:", error);
+      if (Platform.OS === "web") {
+        alert("更新中にエラーが発生しました。");
+      } else {
+        Alert.alert("エラー", "更新中にエラーが発生しました。");
+      }
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const handleDeleteRecord = async (id: string) => {
     if (Platform.OS === "web") {
       // Web環境の場合、window.confirm を使用
@@ -172,41 +274,44 @@ export default function CoffeeItemScreen() {
       );
     }
   };
+
   useEffect(() => {
     const fetchCoffeeRecord = async () => {
       try {
         const record = await CoffeeStorageService.getCoffeeRecordById(id);
         if (record) {
+          // formDataに直接設定するだけで、二重管理を避ける
           setFormData({
-            imageUri: record?.imageUri,
-            name: record?.name,
-            variety: record?.variety,
-            productionArea: record?.productionArea,
+            name: record.name,
+            variety: record.variety,
+            productionArea: record.productionArea,
             roastingDegree: record.roastingDegree,
-            extractionMethod: record?.extractionMethod,
-            extractionMaker: record?.extractionMaker,
-            grindSize: record?.grindSize,
-            temperature: record?.temperature,
-            coffeeAmount: record?.coffeeAmount,
-            waterAmount: record?.waterAmount,
-            extractionTime: record?.extractionTime,
-            acidity: record?.acidity,
-            bitterness: record?.bitterness,
-            sweetness: record?.sweetness,
-            body: record?.body,
-            aroma: record?.aroma,
-            aftertaste: record?.aftertaste,
-            memo: record?.memo,
+            extractionMethod: record.extractionMethod,
+            extractionMaker: record.extractionMaker,
+            grindSize: record.grindSize,
+            temperature: record.temperature,
+            coffeeAmount: record.coffeeAmount,
+            waterAmount: record.waterAmount,
+            extractionTime: record.extractionTime,
+            acidity: record.acidity,
+            bitterness: record.bitterness,
+            sweetness: record.sweetness,
+            body: record.body,
+            aroma: record.aroma,
+            aftertaste: record.aftertaste,
+            memo: record.memo,
+            imageUri: record.imageUri,
           });
 
           setRangeValues({
-            acidity: record?.acidity,
-            bitterness: record?.bitterness,
-            sweetness: record?.sweetness,
-            body: record?.body,
-            aroma: record?.aroma,
-            aftertaste: record?.aftertaste,
+            acidity: record.acidity,
+            bitterness: record.bitterness,
+            sweetness: record.sweetness,
+            body: record.body,
+            aroma: record.aroma,
+            aftertaste: record.aftertaste,
           });
+
           setCoffeeRecord(record);
         }
       } catch (error) {
@@ -246,122 +351,208 @@ export default function CoffeeItemScreen() {
             showsVerticalScrollIndicator={true}
           >
             <InputComponent
-              dataTitle={InputLabel.beansName}
-              onChange={(value: string) =>
-                handleInputChange("beansName", value)
-              }
-              value={coffeeRecord.name}
+              dataTitle={InputLabel.name}
+              onChange={(value: string) => handleInputChange("name", value)}
+              value={formData.name !== undefined ? formData.name : ""}
             />
             <ImageUploadComponent
               onChange={handleImageChange}
-              value={coffeeRecord.imageUri}
+              value={formData.imageUri !== undefined ? formData.imageUri : ""}
             />
             <InputComponent
               dataTitle={InputLabel.variety}
               onChange={(value: string) => handleInputChange("variety", value)}
-              value={coffeeRecord.variety}
+              value={formData.variety !== undefined ? formData.variety : ""}
             />
             <InputComponent
               dataTitle={InputLabel.productionArea}
               onChange={(value: string) =>
                 handleInputChange("productionArea", value)
               }
-              value={coffeeRecord.productionArea}
+              value={
+                formData.productionArea !== undefined
+                  ? formData.productionArea
+                  : ""
+              }
             />
             <SelectComponent
               dataTitle={SelectLabel.roastingDegree}
               onChange={(value: string) =>
                 handleSelectChange("roastingDegree", value)
               }
-              value={coffeeRecord.roastingDegree}
+              value={
+                formData.roastingDegree !== undefined
+                  ? formData.roastingDegree
+                  : ""
+              }
             />
             <SelectComponent
               dataTitle={SelectLabel.extractionMethod}
               onChange={(value: string) =>
                 handleSelectChange("extractionMethod", value)
               }
-              value={coffeeRecord.extractionMethod}
+              value={
+                formData.extractionMethod !== undefined
+                  ? formData.extractionMethod
+                  : ""
+              }
             />
             <SelectComponent
               dataTitle={SelectLabel.extractionMaker}
               onChange={(value: string) =>
                 handleSelectChange("extractionMaker", value)
               }
-              value={coffeeRecord.extractionMaker}
+              value={
+                formData.extractionMaker !== undefined
+                  ? formData.extractionMaker
+                  : ""
+              }
             />
             <SelectComponent
               dataTitle={SelectLabel.grindSize}
               onChange={(value: string) =>
                 handleSelectChange("grindSize", value)
               }
-              value={coffeeRecord.grindSize}
+              value={formData.grindSize !== undefined ? formData.grindSize : ""}
             />
             <NumberComponent
               dataTitle={NumberLabel.temperature}
               onChange={(value: number) =>
                 handleInputChange("temperature", value)
               }
-              value={coffeeRecord.temperature}
+              value={
+                formData.temperature !== undefined ? formData.temperature : 0
+              }
             />
             <NumberComponent
               dataTitle={NumberLabel.coffeeAmount}
               onChange={(value: number) =>
                 handleInputChange("coffeeAmount", value)
               }
-              value={coffeeRecord.coffeeAmount}
+              value={
+                formData.coffeeAmount !== undefined ? formData.coffeeAmount : 0
+              }
             />
             <NumberComponent
               dataTitle={NumberLabel.waterAmount}
               onChange={(value: number) =>
                 handleInputChange("waterAmount", value)
               }
-              value={coffeeRecord.waterAmount}
+              value={
+                formData.waterAmount !== undefined ? formData.waterAmount : 0
+              }
             />
             <MeasuredTimeInputComponent
               onChange={handleMeasuredTimeChange}
-              value={coffeeRecord.extractionTime}
+              value={
+                formData.extractionTime !== undefined
+                  ? formData.extractionTime
+                  : ""
+              }
             />
             <RangeComponent
               dataTitle={RangeLabel.acidity}
               onChange={(value: number) => handleRangeChange("acidity", value)}
-              value={rangeValues.acidity}
+              value={
+                rangeValues.acidity !== undefined ? rangeValues.acidity : 0
+              }
             />
             <RangeComponent
               dataTitle={RangeLabel.bitterness}
               onChange={(value: number) =>
                 handleRangeChange("bitterness", value)
               }
-              value={rangeValues.bitterness}
+              value={
+                rangeValues.bitterness !== undefined
+                  ? rangeValues.bitterness
+                  : 0
+              }
             />
             <RangeComponent
               dataTitle={RangeLabel.sweetness}
               onChange={(value: number) =>
                 handleRangeChange("sweetness", value)
               }
-              value={rangeValues.sweetness}
+              value={
+                rangeValues.sweetness !== undefined ? rangeValues.sweetness : 0
+              }
             />
             <RangeComponent
               dataTitle={RangeLabel.body}
               onChange={(value: number) => handleRangeChange("body", value)}
-              value={rangeValues.body}
+              value={rangeValues.body !== undefined ? rangeValues.body : 0}
             />
             <RangeComponent
               dataTitle={RangeLabel.aroma}
               onChange={(value: number) => handleRangeChange("aroma", value)}
-              value={rangeValues.aroma}
+              value={rangeValues.aroma !== undefined ? rangeValues.aroma : 0}
             />
             <RangeComponent
               dataTitle={RangeLabel.aftertaste}
               onChange={(value: number) =>
                 handleRangeChange("aftertaste", value)
               }
-              value={rangeValues.aftertaste}
+              value={
+                rangeValues.aftertaste !== undefined
+                  ? rangeValues.aftertaste
+                  : 0
+              }
             />
-            <RadarChart data={rangeValues} />
+            <RadarChart
+              data={{
+                acidity:
+                  rangeValues.acidity !== undefined ? rangeValues.acidity : 0,
+                bitterness:
+                  rangeValues.bitterness !== undefined
+                    ? rangeValues.bitterness
+                    : 0,
+                sweetness:
+                  rangeValues.sweetness !== undefined
+                    ? rangeValues.sweetness
+                    : 0,
+                body: rangeValues.body !== undefined ? rangeValues.body : 0,
+                aroma: rangeValues.aroma !== undefined ? rangeValues.aroma : 0,
+                aftertaste:
+                  rangeValues.aftertaste !== undefined
+                    ? rangeValues.aftertaste
+                    : 0,
+              }}
+            />
+
             <TextAreaComponent
               onChange={handleTextAreaChange}
-              value={coffeeRecord.memo}
+              value={formData.memo !== undefined ? formData.memo : ""}
             />
+
+            {/* Update Button */}
+            <TouchableOpacity
+              style={styles.updateButton}
+              onPress={handleUpdateRecord}
+              disabled={updating}
+            >
+              <Text style={styles.updateButtonText}>
+                {updating ? "更新中..." : "コーヒー情報を更新する"}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Delete Button */}
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteRecord(id)}
+              disabled={updating}
+            >
+              <Text style={styles.deleteButtonText}>
+                コーヒー情報を削除する
+              </Text>
+            </TouchableOpacity>
+
+            {/* Return to List Button */}
+            <TouchableOpacity
+              style={styles.returnButton}
+              onPress={() => router.push("/list")}
+            >
+              <Text style={styles.returnButtonText}>リストに戻る</Text>
+            </TouchableOpacity>
           </ScrollView>
         </View>
       </View>
@@ -396,7 +587,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     alignItems: "center",
     paddingVertical: 20,
-    paddingBottom: 40,
+    paddingBottom: 80, // Increased padding to accommodate buttons
   },
   imageContents: {
     width: "90%",
@@ -414,75 +605,54 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 18,
   },
-  nameContainer: {
-    // name スタイル
-  },
-  varietyContainer: {},
-  productionAreaContainer: {},
-  roastingDegreeContainer: {},
-  extractionMethodContainer: {},
-  extractionMakerContainer: {},
-  grindSizeContainer: {},
-  temperatureContainer: {},
-  coffeeAmountContainer: {},
-  waterAmountContainer: {},
-  extractionTimeContainer: {},
-  acidityContainer: {},
-  sweetnessContainer: {},
-  bitternessContainer: {},
-  bodyContainer: {},
-  aromaContainer: {},
-  aftertasteContainer: {},
-  radarChartContainer: {},
-  recordRadarChart: {},
-  memoContainer: {},
   labelText: {
     color: "#D2B48C",
     paddingVertical: 10,
     textAlign: "center",
   },
-  valueText: { textAlign: "center" },
+  valueText: {
+    textAlign: "center",
+  },
   deleteButton: {
-    backgroundColor: "red",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    backgroundColor: "#FF6347", // Tomato red
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    width: "80%",
     alignSelf: "center",
   },
   deleteButtonText: {
     color: "white",
     textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   updateButton: {
-    backgroundColor: "blue",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    backgroundColor: "#4682B4", // Steel blue
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 30,
+    width: "80%",
     alignSelf: "center",
   },
   updateButtonText: {
     color: "white",
     textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
   },
-  name: {
-    // name スタイル
+  returnButton: {
+    backgroundColor: "#6B8E23", // Olive drab
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    width: "80%",
+    alignSelf: "center",
   },
-  variety: {},
-  productionArea: {},
-  roastingDegree: {},
-  extractionMethod: {},
-  extractionMaker: {},
-  grindSize: {},
-  temperature: {},
-  coffeeAmount: {},
-  waterAmount: {},
-  extractionTime: {},
-  acidity: {},
-  sweetness: {},
-  bitterness: {},
-  body: {},
-  aroma: {},
-  aftertaste: {},
-  radarChart: {},
-  memo: {},
+  returnButtonText: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });
