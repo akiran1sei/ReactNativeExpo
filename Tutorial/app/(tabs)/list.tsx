@@ -183,302 +183,310 @@ export default function ListScreen() {
             >
               <View style={styles.recordContainer}>
                 {coffeeRecords.map((record) => (
-                  <TouchableOpacity
-                    key={record.id}
-                    onPress={() =>
-                      router.push({ pathname: `./item/${record.id}` })
-                    }
-                  >
+                  <View key={record.id} style={styles.rowContainer}>
+                    {/* チェックボックスを追加（リストアイテムの選択用） */}
                     <Checkbox
                       value={selectedRecords.includes(record.id)}
                       onValueChange={() => toggleSelection(record.id)}
                     />
-                    <View style={styles.recordItem}>
-                      <View style={styles.nameContainer}>
-                        <Text
-                          style={[styles.text, styles.labelText, styles.name]}
-                        >
-                          コーヒー豆
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.name}
-                        </Text>
-                      </View>
-                      <View style={styles.imageUriContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.imageUri,
-                          ]}
-                        >
-                          画像
-                        </Text>
-                        {/* 画像表示部分 */}
-                        <Image
-                          source={getImageSource(record.imageUri)}
-                          style={styles.recordImagePreview}
-                          defaultSource={require("../../assets/images/no-image.png")} // Optional fallback
-                        />
-                      </View>
-                      <View style={styles.varietyContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.variety,
-                          ]}
-                        >
-                          種類
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.variety}
-                        </Text>
-                      </View>
-                      <View style={styles.productionAreaContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.productionArea,
-                          ]}
-                        >
-                          産地
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.productionArea}
-                        </Text>
-                      </View>
-                      <View style={styles.roastingDegreeContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.roastingDegree,
-                          ]}
-                        >
-                          焙煎度
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.roastingDegree}
-                        </Text>
-                      </View>
-                      <View style={styles.extractionMethodContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.extractionMethod,
-                          ]}
-                        >
-                          抽出器具
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.extractionMethod}
-                        </Text>
-                      </View>
-                      <View style={styles.extractionMakerContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.extractionMaker,
-                          ]}
-                        >
-                          抽出メーカー
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.extractionMaker}
-                        </Text>
-                      </View>
-                      <View style={styles.grindSizeContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.grindSize,
-                          ]}
-                        >
-                          挽き目
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.grindSize}
-                        </Text>
-                      </View>
-                      <View style={styles.temperatureContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.temperature,
-                          ]}
-                        >
-                          注湯温度
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.temperature}
-                        </Text>
-                      </View>
-                      <View style={styles.coffeeAmountContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.coffeeAmount,
-                          ]}
-                        >
-                          粉量
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.coffeeAmount}
-                        </Text>
-                      </View>
-                      <View style={styles.waterAmountContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.waterAmount,
-                          ]}
-                        >
-                          水量
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.waterAmount}
-                        </Text>
-                      </View>
-                      <View style={styles.extractionTimeContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.extractionTime,
-                          ]}
-                        >
-                          抽出時間
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.extractionTime}
-                        </Text>
-                      </View>
 
-                      <View style={styles.acidityContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.acidity,
-                          ]}
-                        >
-                          酸味
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.acidity}
-                        </Text>
-                      </View>
-                      <View style={styles.sweetnessContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.sweetness,
-                          ]}
-                        >
-                          甘味
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.sweetness}
-                        </Text>
-                      </View>
-                      <View style={styles.bitternessContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.bitterness,
-                          ]}
-                        >
-                          苦味
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.bitterness}
-                        </Text>
-                      </View>
-                      <View style={styles.bodyContainer}>
-                        <Text
-                          style={[styles.text, styles.labelText, styles.body]}
-                        >
-                          コク
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.body}
-                        </Text>
-                      </View>
-                      <View style={styles.aromaContainer}>
-                        <Text
-                          style={[styles.text, styles.labelText, styles.aroma]}
-                        >
-                          香り
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.aroma}
-                        </Text>
-                      </View>
-                      <View style={styles.aftertasteContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.aftertaste,
-                          ]}
-                        >
-                          後味
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.aftertaste}
-                        </Text>
-                      </View>
-                      <View style={styles.radarChartContainer}>
-                        <Text
-                          style={[
-                            styles.text,
-                            styles.labelText,
-                            styles.radarChart,
-                          ]}
-                        >
-                          radarChart
-                        </Text>
-                        <View style={styles.recordRadarChart}>
-                          <RadarChart
-                            data={{
-                              acidity: Number(record.acidity) || 0,
-                              bitterness: Number(record.bitterness) || 0,
-                              sweetness: Number(record.sweetness) || 0,
-                              body: Number(record.body) || 0,
-                              aroma: Number(record.aroma) || 0,
-                              aftertaste: Number(record.aftertaste) || 0,
-                            }}
+                    <TouchableOpacity
+                      key={record.id}
+                      onPress={() =>
+                        router.push({ pathname: `./item/${record.id}` })
+                      }
+                    >
+                      <View style={styles.recordItem}>
+                        <View style={styles.nameContainer}>
+                          <Text
+                            style={[styles.text, styles.labelText, styles.name]}
+                          >
+                            コーヒー豆
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.name}
+                          </Text>
+                        </View>
+                        <View style={styles.imageUriContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.imageUri,
+                            ]}
+                          >
+                            画像
+                          </Text>
+                          {/* 画像表示部分 */}
+                          <Image
+                            source={getImageSource(record.imageUri)}
+                            style={styles.recordImagePreview}
+                            defaultSource={require("../../assets/images/no-image.png")} // Optional fallback
                           />
                         </View>
-                      </View>
-                      <View style={styles.memoContainer}>
-                        <Text
-                          style={[styles.text, styles.labelText, styles.memo]}
+                        <View style={styles.varietyContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.variety,
+                            ]}
+                          >
+                            種類
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.variety}
+                          </Text>
+                        </View>
+                        <View style={styles.productionAreaContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.productionArea,
+                            ]}
+                          >
+                            産地
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.productionArea}
+                          </Text>
+                        </View>
+                        <View style={styles.roastingDegreeContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.roastingDegree,
+                            ]}
+                          >
+                            焙煎度
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.roastingDegree}
+                          </Text>
+                        </View>
+                        <View style={styles.extractionMethodContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.extractionMethod,
+                            ]}
+                          >
+                            抽出器具
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.extractionMethod}
+                          </Text>
+                        </View>
+                        <View style={styles.extractionMakerContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.extractionMaker,
+                            ]}
+                          >
+                            抽出メーカー
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.extractionMaker}
+                          </Text>
+                        </View>
+                        <View style={styles.grindSizeContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.grindSize,
+                            ]}
+                          >
+                            挽き目
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.grindSize}
+                          </Text>
+                        </View>
+                        <View style={styles.temperatureContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.temperature,
+                            ]}
+                          >
+                            注湯温度
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.temperature}
+                          </Text>
+                        </View>
+                        <View style={styles.coffeeAmountContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.coffeeAmount,
+                            ]}
+                          >
+                            粉量
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.coffeeAmount}
+                          </Text>
+                        </View>
+                        <View style={styles.waterAmountContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.waterAmount,
+                            ]}
+                          >
+                            水量
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.waterAmount}
+                          </Text>
+                        </View>
+                        <View style={styles.extractionTimeContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.extractionTime,
+                            ]}
+                          >
+                            抽出時間
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.extractionTime}
+                          </Text>
+                        </View>
+
+                        <View style={styles.acidityContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.acidity,
+                            ]}
+                          >
+                            酸味
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.acidity}
+                          </Text>
+                        </View>
+                        <View style={styles.sweetnessContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.sweetness,
+                            ]}
+                          >
+                            甘味
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.sweetness}
+                          </Text>
+                        </View>
+                        <View style={styles.bitternessContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.bitterness,
+                            ]}
+                          >
+                            苦味
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.bitterness}
+                          </Text>
+                        </View>
+                        <View style={styles.bodyContainer}>
+                          <Text
+                            style={[styles.text, styles.labelText, styles.body]}
+                          >
+                            コク
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.body}
+                          </Text>
+                        </View>
+                        <View style={styles.aromaContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.aroma,
+                            ]}
+                          >
+                            香り
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.aroma}
+                          </Text>
+                        </View>
+                        <View style={styles.aftertasteContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.aftertaste,
+                            ]}
+                          >
+                            後味
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.aftertaste}
+                          </Text>
+                        </View>
+                        <View style={styles.radarChartContainer}>
+                          <Text
+                            style={[
+                              styles.text,
+                              styles.labelText,
+                              styles.radarChart,
+                            ]}
+                          >
+                            radarChart
+                          </Text>
+                          <View style={styles.recordRadarChart}>
+                            <RadarChart
+                              data={{
+                                acidity: Number(record.acidity) || 0,
+                                bitterness: Number(record.bitterness) || 0,
+                                sweetness: Number(record.sweetness) || 0,
+                                body: Number(record.body) || 0,
+                                aroma: Number(record.aroma) || 0,
+                                aftertaste: Number(record.aftertaste) || 0,
+                              }}
+                            />
+                          </View>
+                        </View>
+                        <View style={styles.memoContainer}>
+                          <Text
+                            style={[styles.text, styles.labelText, styles.memo]}
+                          >
+                            MEMO
+                          </Text>
+                          <Text style={[styles.text, styles.valueText]}>
+                            {record.memo}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => handleDeleteRecord(record.id)}
                         >
-                          MEMO
-                        </Text>
-                        <Text style={[styles.text, styles.valueText]}>
-                          {record.memo}
-                        </Text>
+                          <Text style={styles.deleteButtonText}>削除</Text>
+                        </TouchableOpacity>
                       </View>
-                      <TouchableOpacity
-                        style={styles.deleteButton}
-                        onPress={() => handleDeleteRecord(record.id)}
-                      >
-                        <Text style={styles.deleteButtonText}>削除</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             </ScrollView>
@@ -662,5 +670,10 @@ const styles = StyleSheet.create({
   text: {
     color: "#000",
     fontSize: 18,
+  },
+  rowContainer: {
+    flexDirection: "row", // チェックボックスとアイテムを横並びに
+    alignItems: "center",
+    marginBottom: 10,
   },
 });
