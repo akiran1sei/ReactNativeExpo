@@ -26,38 +26,14 @@ interface CoffeeRecord {
   name: string;
   variety: string;
   productionArea: string;
-  roastingDegree:
-    | "lightroast"
-    | "cinnamonroast"
-    | "mediumroast"
-    | "highroast"
-    | "cityroast"
-    | "fullcityroast"
-    | "frenchroast"
-    | "italianroast";
-  extractionMethod:
-    | "paperdrip"
-    | "neldrip"
-    | "metalfilterdrip"
-    | "frenchpress"
-    | "aeropress"
-    | "coffeemakerdrip"
-    | "syphon"
-    | "espresso"
-    | "mokapotextraction"
-    | "icedrip";
+  roastingDegree: string;
+  extractionMethod: string;
   extractionMaker: string;
-  grindSize:
-    | "extrafine"
-    | "fine"
-    | "mediumfine"
-    | "medium"
-    | "coarse"
-    | "extracourse";
+  grindSize: string;
   temperature: number;
   coffeeAmount: number;
   waterAmount: number;
-  extractionTime: number;
+  extractionTime: string;
   acidity: number;
   bitterness: number;
   sweetness: number;
@@ -65,6 +41,7 @@ interface CoffeeRecord {
   aroma: number;
   aftertaste: number;
   memo: string;
+  imageUri: string;
 }
 // 初期状態を定数として定義
 const initialFormData = {
@@ -127,7 +104,7 @@ export default function CreateScreen() {
     waterAmount: "湯量（g）",
   });
 
-  const [imageData, setImageData] = useState<string | null>(null);
+  const [imageData, setImageData] = useState("");
   const [formData, setFormData] = useState({ ...initialFormData });
   const [rangeValues, setRangeValues] = useState({ ...initialRangeValues });
   // Web環境でフォーム送信後の状態をリセット
@@ -142,7 +119,7 @@ export default function CreateScreen() {
   }, [formSubmitted, isWeb]);
   // フォームリセット関数
   const resetForm = useCallback(() => {
-    setImageData(null);
+    setImageData("../../assets/images/no-image.png");
     setFormData({ ...initialFormData });
     setRangeValues({ ...initialRangeValues });
     setResetKey((prevKey) => prevKey + 1);
@@ -313,6 +290,7 @@ export default function CreateScreen() {
 
       // 型安全な変換
       const coffeeRecord: Omit<CoffeeRecord, "id"> = {
+        imageUri: formData.imageUri,
         name: formData.beansName,
         variety: formData.variety,
         productionArea: formData.productionArea,
@@ -323,7 +301,7 @@ export default function CreateScreen() {
         temperature: formData.temperature,
         coffeeAmount: formData.coffeeAmount,
         waterAmount: formData.waterAmount,
-        extractionTime: parseFloat(formData.extractionTime) || 0,
+        extractionTime: formData.extractionTime,
         acidity: formData.acidity,
         bitterness: formData.bitterness,
         sweetness: formData.sweetness,
@@ -335,7 +313,7 @@ export default function CreateScreen() {
 
       const recordId = await CoffeeStorageService.saveCoffeeRecord(
         coffeeRecord,
-        formData.imageUri || undefined
+        formData.imageUri
       );
 
       showWebAlert(

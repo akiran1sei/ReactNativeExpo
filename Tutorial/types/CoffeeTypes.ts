@@ -6,20 +6,18 @@ export interface CoffeeRecord {
   productionArea: string; // 産地
   roastingDegree: string; // 焙煎度
   extractionMethod: string;
-
   extractionMaker: string;
-
   grindSize: string; // 挽き目
   temperature: number; // 温度（℃）
   coffeeAmount: number; // 粉量（g）
   waterAmount: number; // 湯量（g）
-  extractionTime: string | number; // 抽出時間
-  acidity: string | number; // 酸味（1-10）
-  bitterness: string | number; // 苦味（1-10）
-  sweetness: string | number; // 甘味（1-10）
-  body: string | number; // コク（1-10）
-  aroma: string | number; // 香り（1-10）
-  aftertaste: string | number; // 後味（1-10）
-  memo?: string; // メモ
-  imageUri?: string | null; // 画像のパス
+  extractionTime: string; // 抽出時間
+  acidity: number; // 酸味（1-10）
+  bitterness: number; // 苦味（1-10）
+  sweetness: number; // 甘味（1-10）
+  body: number; // コク（1-10）
+  aroma: number; // 香り（1-10）
+  aftertaste: number; // 後味（1-10）
+  memo: string; // メモ
+  imageUri: string; // 画像のパス
 }
