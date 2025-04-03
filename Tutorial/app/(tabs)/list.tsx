@@ -519,15 +519,18 @@ const styles = StyleSheet.create({
   },
   valueText: { textAlign: "center" },
   deleteButton: {
-    backgroundColor: "red",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    backgroundColor: "#FF6347", // Tomato red
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    width: "80%",
     alignSelf: "center",
   },
   deleteButtonText: {
     color: "white",
     textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   imageUriContainer: {},
   nameContainer: {},
