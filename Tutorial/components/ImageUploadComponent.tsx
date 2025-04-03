@@ -11,7 +11,7 @@ import * as ImagePicker from "expo-image-picker";
 
 interface ImagePickerProps {
   onChange: (value: string) => void;
-  value?: string | null; // Property to receive values from parent component for reset
+  value: string; // Property to receive values from parent component for reset
 }
 
 const ImageUploadComponent: React.FC<ImagePickerProps> = ({
@@ -21,11 +21,11 @@ const ImageUploadComponent: React.FC<ImagePickerProps> = ({
   // Set default image URI
   const defaultImage = require("../assets/images/no-image.png");
 
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string>();
 
   // Update image state when value from parent component changes
   useEffect(() => {
-    setImage(value || null);
+    setImage(value);
   }, [value]);
 
   const pickImage = async () => {

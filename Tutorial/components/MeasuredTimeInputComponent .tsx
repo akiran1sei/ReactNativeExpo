@@ -23,7 +23,8 @@ const MeasuredTimeInputComponent: React.FC<TimeInputProps> = ({
   const secondsInput = useRef<TextInput>(null);
 
   useEffect(() => {
-    if (value) {
+    if (typeof value === "string" && value) {
+      // 文字列型であることを確認
       const [min, sec] = value.split(":");
       setMinutes(min || "");
       setSeconds(sec || "");

@@ -42,13 +42,11 @@ class CoffeeStorageService {
   // 新しいコーヒーレコードを保存
   async saveCoffeeRecord(
     record: Omit<CoffeeRecord, "id">,
-    imageUri?: string
+    imageUri: string
   ): Promise<string> {
     try {
-      // 一意のIDを生成
       const id = uuidv4();
 
-      // 画像がある場合は処理
       let processedImageUri = null;
       if (imageUri) {
         if (this.isWeb) {
@@ -58,11 +56,13 @@ class CoffeeStorageService {
         }
       }
 
-      // 完全なレコードを作成
+      // 画像処理が失敗した場合のデフォルト値を設定
+      const finalImageUri = processedImageUri || "default_image_path";
+
       const fullRecord: CoffeeRecord = {
         id,
         ...record,
-        imageUri: processedImageUri,
+        imageUri: finalImageUri,
       };
       // 既存のレコードを取得
       let existingRecords: CoffeeRecord[] = [];
