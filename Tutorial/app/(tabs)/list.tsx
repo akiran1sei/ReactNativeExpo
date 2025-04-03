@@ -17,10 +17,26 @@ import PageTitleComponent from "../../components/PageTitleComponent";
 import CoffeeStorageService from "../../services/CoffeeStorageService";
 import { CoffeeRecord } from "../../types/CoffeeTypes";
 import RadarChart from "../../components/RadarChart/RadarChart";
+import Checkbox from "expo-checkbox"; // チェックボックスを追加
 
 export default function ListScreen() {
   const router = useRouter();
   const [coffeeRecords, setCoffeeRecords] = useState<CoffeeRecord[]>([]);
+  const [selectedRecords, setSelectedRecords] = useState<string[]>([]); // 選択されたIDの配列を管理
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const records = await CoffeeStorageService.getAllCoffeeRecords();
+      setCoffeeRecords(records);
+    } catch (error) {
+      console.error("データの取得に失敗しました:", error);
+    }
+  };
 
   const [selectedRecord, setSelectedRecord] = useState<CoffeeRecord | null>(
     null
@@ -37,40 +53,52 @@ export default function ListScreen() {
   };
 
   const [rangeValues, setRangeValues] = useState(defaultRangeValues);
-  const [refreshing, setRefreshing] = useState(false); // リフレッシュ状態を管理
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-  const fetchData = async () => {
-    try {
-      const records = await CoffeeStorageService.getAllCoffeeRecords();
-      setCoffeeRecords(records);
-
-      // Select the first record if available
-      if (records.length > 0) {
-        setSelectedRecord(records[0]);
-        updateRangeValues(records[0]);
-      }
-    } catch (error) {
-      console.error("データの取得に失敗しました:", error);
-    }
-  };
   const handleRefresh = async () => {
-    setRefreshing(true); // リフレッシュ開始
-    await fetchData(); // データ再取得
-    setRefreshing(false); // リフレッシュ終了
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
   };
-  // Update range values based on a coffee record
-  const updateRangeValues = (record: CoffeeRecord) => {
-    setRangeValues({
-      acidity: Number(record.acidity) || 0,
-      bitter: Number(record.bitterness) || 0,
-      sweet: Number(record.sweetness) || 0,
-      rich: Number(record.body) || 0,
-      aroma: Number(record.aroma) || 0,
-      aftertaste: Number(record.aftertaste) || 0,
-    });
+
+  // チェックボックスの選択状態を管理
+  const toggleSelection = (id: string) => {
+    setSelectedRecords((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  // 選択されたレコードを削除
+  const handleDeleteSelected = async () => {
+    if (selectedRecords.length === 0) return;
+
+    const message =
+      selectedRecords.length === 1
+        ? "このレコードを削除しますか？"
+        : `選択した ${selectedRecords.length} 件のレコードを削除しますか？`;
+
+    Alert.alert(
+      "削除確認",
+      message,
+      [
+        { text: "キャンセル", style: "cancel" },
+        {
+          text: "削除",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              for (const id of selectedRecords) {
+                await CoffeeStorageService.deleteCoffeeRecord(id);
+              }
+              setSelectedRecords([]); // 削除後に選択をリセット
+              await fetchData();
+            } catch (error) {
+              console.error("レコードの削除に失敗しました:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
   // 画像URIを環境に応じて適切に処理する関数 - Fixed return type
   const getImageSource = (uri?: string | null): ImageSourcePropType => {
@@ -161,6 +189,10 @@ export default function ListScreen() {
                       router.push({ pathname: `./item/${record.id}` })
                     }
                   >
+                    <Checkbox
+                      value={selectedRecords.includes(record.id)}
+                      onValueChange={() => toggleSelection(record.id)}
+                    />
                     <View style={styles.recordItem}>
                       <View style={styles.nameContainer}>
                         <Text
@@ -452,6 +484,19 @@ export default function ListScreen() {
             </ScrollView>
             {/* 縦方向にスクロールするコンテンツ */}
           </ScrollView>
+          {/* 削除ボタン */}
+          {selectedRecords.length > 0 && (
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleDeleteSelected}
+            >
+              <Text style={styles.deleteButtonText}>
+                {selectedRecords.length === 1
+                  ? "削除"
+                  : `選択した ${selectedRecords.length} 件を削除`}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>
