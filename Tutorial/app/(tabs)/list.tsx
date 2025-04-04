@@ -183,7 +183,7 @@ export default function ListScreen() {
             >
               <View style={styles.recordContainer}>
                 {coffeeRecords.map((record) => (
-                  <View key={record.id} style={styles.rowContainer}>
+                  <View key={record.id} style={styles.wrapContainer}>
                     {/* チェックボックスを追加（リストアイテムの選択用） */}
                     <Checkbox
                       value={selectedRecords.includes(record.id)}
@@ -671,8 +671,9 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 18,
   },
-  rowContainer: {
-    flexDirection: "row", // チェックボックスとアイテムを横並びに
+  wrapContainer: {
+    flexDirection: "column",
+
     alignItems: "center",
     marginBottom: 10,
   },
