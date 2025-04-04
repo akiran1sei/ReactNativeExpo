@@ -105,7 +105,7 @@ export default function CoffeeItemScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -113,7 +113,7 @@ export default function CoffeeItemScreen() {
   if (!coffeeRecord) {
     return (
       <View style={styles.container}>
-        <Text>コーヒーレコードが見つかりません</Text>
+        <Text style={styles.errorText}>コーヒーレコードが見つかりません</Text>
       </View>
     );
   }
@@ -126,195 +126,130 @@ export default function CoffeeItemScreen() {
         <View style={[styles.absoluteBox, styles.mainContents]}>
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
-            showsVerticalScrollIndicator={true}
+            showsVerticalScrollIndicator={false}
           >
-            <View style={styles.imageContents}>
-              <Image
-                source={getImageSource(coffeeRecord.imageUri)}
-                style={styles.recordImagePreview}
-                defaultSource={require("../../../assets/images/no-image.png")} // Optional fallback
-              />
-            </View>
-
-            <View style={styles.varietyContainer}>
-              <Text style={[styles.text, styles.labelText, styles.variety]}>
-                種類
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.variety}
-              </Text>
-            </View>
-            <View style={styles.productionAreaContainer}>
-              <Text
-                style={[styles.text, styles.labelText, styles.productionArea]}
-              >
-                産地
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.productionArea}
-              </Text>
-            </View>
-            <View style={styles.roastingDegreeContainer}>
-              <Text
-                style={[styles.text, styles.labelText, styles.roastingDegree]}
-              >
-                焙煎度
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.roastingDegree}
-              </Text>
-            </View>
-            <View style={styles.extractionMethodContainer}>
-              <Text
-                style={[styles.text, styles.labelText, styles.extractionMethod]}
-              >
-                抽出器具
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.extractionMethod}
-              </Text>
-            </View>
-            <View style={styles.extractionMakerContainer}>
-              <Text
-                style={[styles.text, styles.labelText, styles.extractionMaker]}
-              >
-                抽出メーカー
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.extractionMaker}
-              </Text>
-            </View>
-            <View style={styles.grindSizeContainer}>
-              <Text style={[styles.text, styles.labelText, styles.grindSize]}>
-                挽き目
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.grindSize}
-              </Text>
-            </View>
-            <View style={styles.temperatureContainer}>
-              <Text style={[styles.text, styles.labelText, styles.temperature]}>
-                注湯温度
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.temperature}
-              </Text>
-            </View>
-            <View style={styles.coffeeAmountContainer}>
-              <Text
-                style={[styles.text, styles.labelText, styles.coffeeAmount]}
-              >
-                粉量
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.coffeeAmount}
-              </Text>
-            </View>
-            <View style={styles.waterAmountContainer}>
-              <Text style={[styles.text, styles.labelText, styles.waterAmount]}>
-                水量
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.waterAmount}
-              </Text>
-            </View>
-            <View style={styles.extractionTimeContainer}>
-              <Text
-                style={[styles.text, styles.labelText, styles.extractionTime]}
-              >
-                抽出時間
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.extractionTime}
-              </Text>
-            </View>
-            <View style={styles.acidityContainer}>
-              <Text style={[styles.text, styles.labelText, styles.acidity]}>
-                酸味
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.acidity}
-              </Text>
-            </View>
-            <View style={styles.sweetnessContainer}>
-              <Text style={[styles.text, styles.labelText, styles.sweetness]}>
-                甘味
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.sweetness}
-              </Text>
-            </View>
-            <View style={styles.bitternessContainer}>
-              <Text style={[styles.text, styles.labelText, styles.bitterness]}>
-                苦味
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.bitterness}
-              </Text>
-            </View>
-            <View style={styles.bodyContainer}>
-              <Text style={[styles.text, styles.labelText, styles.body]}>
-                コク
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.body}
-              </Text>
-            </View>
-            <View style={styles.aromaContainer}>
-              <Text style={[styles.text, styles.labelText, styles.aroma]}>
-                香り
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.aroma}
-              </Text>
-            </View>
-            <View style={styles.aftertasteContainer}>
-              <Text style={[styles.text, styles.labelText, styles.aftertaste]}>
-                後味
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.aftertaste}
-              </Text>
-            </View>
-            <View style={styles.radarChartContainer}>
-              <Text style={[styles.text, styles.labelText, styles.radarChart]}>
-                radarChart
-              </Text>
-              <View style={styles.recordRadarChart}>
-                <RadarChart
-                  data={{
-                    acidity: Number(coffeeRecord.acidity) || 0,
-                    bitterness: Number(coffeeRecord.bitterness) || 0,
-                    sweetness: Number(coffeeRecord.sweetness) || 0,
-                    body: Number(coffeeRecord.body) || 0,
-                    aroma: Number(coffeeRecord.aroma) || 0,
-                    aftertaste: Number(coffeeRecord.aftertaste) || 0,
-                  }}
+            <View style={styles.itemContainer}>
+              <View style={styles.imageContents}>
+                <Image
+                  source={getImageSource(coffeeRecord.imageUri)}
+                  style={styles.recordImagePreview}
+                  defaultSource={require("../../../assets/images/no-image.png")} // Optional fallback
                 />
               </View>
+
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>種類</Text>
+                <Text style={styles.valueText}>{coffeeRecord.variety}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>産地</Text>
+                <Text style={styles.valueText}>
+                  {coffeeRecord.productionArea}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>焙煎度</Text>
+                <Text style={styles.valueText}>
+                  {coffeeRecord.roastingDegree}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>抽出器具</Text>
+                <Text style={styles.valueText}>
+                  {coffeeRecord.extractionMethod}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>抽出メーカー</Text>
+                <Text style={styles.valueText}>
+                  {coffeeRecord.extractionMaker}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>挽き目</Text>
+                <Text style={styles.valueText}>{coffeeRecord.grindSize}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>注湯温度</Text>
+                <Text style={styles.valueText}>{coffeeRecord.temperature}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>粉量</Text>
+                <Text style={styles.valueText}>
+                  {coffeeRecord.coffeeAmount}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>水量</Text>
+                <Text style={styles.valueText}>{coffeeRecord.waterAmount}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>抽出時間</Text>
+                <Text style={styles.valueText}>
+                  {coffeeRecord.extractionTime}
+                </Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>酸味</Text>
+                <Text style={styles.valueText}>{coffeeRecord.acidity}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>甘味</Text>
+                <Text style={styles.valueText}>{coffeeRecord.sweetness}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>苦味</Text>
+                <Text style={styles.valueText}>{coffeeRecord.bitterness}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>コク</Text>
+                <Text style={styles.valueText}>{coffeeRecord.body}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>香り</Text>
+                <Text style={styles.valueText}>{coffeeRecord.aroma}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.labelText}>後味</Text>
+                <Text style={styles.valueText}>{coffeeRecord.aftertaste}</Text>
+              </View>
+
+              <View style={styles.radarChartContainer}>
+                <Text style={styles.sectionTitle}>レーダーチャート</Text>
+                <View style={styles.recordRadarChart}>
+                  <RadarChart
+                    data={{
+                      acidity: Number(coffeeRecord.acidity) || 0,
+                      bitterness: Number(coffeeRecord.bitterness) || 0,
+                      sweetness: Number(coffeeRecord.sweetness) || 0,
+                      body: Number(coffeeRecord.body) || 0,
+                      aroma: Number(coffeeRecord.aroma) || 0,
+                      aftertaste: Number(coffeeRecord.aftertaste) || 0,
+                    }}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.memoContainer}>
+                <Text style={styles.sectionTitle}>MEMO</Text>
+                <Text style={styles.memoText}>{coffeeRecord.memo}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.updateButton}
+                onPress={() =>
+                  router.push({ pathname: `../update/${coffeeRecord.id}` })
+                }
+              >
+                <Text style={styles.buttonText}>編集</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDeleteRecord(coffeeRecord.id)}
+              >
+                <Text style={styles.buttonText}>削除</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.memoContainer}>
-              <Text style={[styles.text, styles.labelText, styles.memo]}>
-                MEMO
-              </Text>
-              <Text style={[styles.text, styles.valueText]}>
-                {coffeeRecord.memo}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={() =>
-                router.push({ pathname: `../update/${coffeeRecord.id}` })
-              }
-            >
-              <Text style={styles.updateButtonText}>編集</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeleteRecord(coffeeRecord.id)}
-            >
-              <Text style={styles.deleteButtonText}>削除</Text>
-            </TouchableOpacity>
           </ScrollView>
         </View>
       </View>
@@ -325,7 +260,7 @@ export default function CoffeeItemScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#f8f8f8",
   },
   contents: {
     flex: 1,
@@ -341,101 +276,110 @@ const styles = StyleSheet.create({
   },
   mainContents: {
     width: "100%",
-    maxWidth: 500,
+    maxWidth: 600, // 少し広めに
     marginHorizontal: "auto",
-    top: 210,
+    top: 160, // ヘッダーとタイトルに合わせて調整
     bottom: 0,
   },
   scrollContainer: {
     alignItems: "center",
     paddingVertical: 20,
-    paddingBottom: 40,
+    paddingBottom: 60, // 下部のボタンのために余白
+    width: "100%",
+  },
+  itemContainer: {
+    width: "90%",
+    maxWidth: 500,
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   imageContents: {
-    width: "90%",
-    marginBottom: 10,
-    alignSelf: "center", // Center the contents
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 20,
   },
   recordImagePreview: {
-    width: 200,
-    height: 200,
-    borderRadius: 10,
-    marginHorizontal: "auto",
-    backgroundColor: "#F0F0F0", // デフォルト画像がない場合の背景色
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "#e0e0e0",
+    marginBottom: 15,
   },
-  text: {
-    color: "#000",
+  detailItem: {
+    width: "100%",
+    marginBottom: 15,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  labelText: {
+    color: "#777",
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  valueText: {
+    color: "#333",
     fontSize: 18,
   },
-  varietyContainer: {},
-  productionAreaContainer: {},
-  roastingDegreeContainer: {},
-  extractionMethodContainer: {},
-  extractionMakerContainer: {},
-  grindSizeContainer: {},
-  temperatureContainer: {},
-  coffeeAmountContainer: {},
-  waterAmountContainer: {},
-  extractionTimeContainer: {},
-  acidityContainer: {},
-  sweetnessContainer: {},
-  bitternessContainer: {},
-  bodyContainer: {},
-  aromaContainer: {},
-  aftertasteContainer: {},
-  radarChartContainer: {},
-  recordRadarChart: {},
-  memoContainer: {},
-  labelText: {
-    color: "#D2B48C",
-    paddingVertical: 10,
+  sectionTitle: {
+    color: "#555",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
     textAlign: "center",
   },
-  valueText: { textAlign: "center" },
+  radarChartContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  recordRadarChart: {
+    width: 250,
+    height: 250,
+  },
+  memoContainer: {
+    width: "100%",
+    marginTop: 20,
+  },
+  memoText: {
+    color: "#333",
+    fontSize: 16,
+    lineHeight: 24,
+  },
   deleteButton: {
-    backgroundColor: "#FF6347", // Tomato red
-    padding: 15,
+    backgroundColor: "#dc3545", // Bootstrap danger color
+    paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
-    width: "80%",
-    alignSelf: "center",
-  },
-  deleteButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 16,
+    width: "100%",
+    alignItems: "center",
   },
   updateButton: {
-    backgroundColor: "#4682B4", // Steel blue
-    padding: 15,
+    backgroundColor: "#007bff", // Bootstrap primary color
+    paddingVertical: 12,
     borderRadius: 8,
-    marginTop: 30,
-    width: "80%",
-    alignSelf: "center",
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
   },
-  updateButtonText: {
+  buttonText: {
     color: "white",
-    textAlign: "center",
     fontWeight: "bold",
     fontSize: 16,
   },
-  variety: {},
-  productionArea: {},
-  roastingDegree: {},
-  extractionMethod: {},
-  extractionMaker: {},
-  grindSize: {},
-  temperature: {},
-  coffeeAmount: {},
-  waterAmount: {},
-  extractionTime: {},
-  acidity: {},
-  sweetness: {},
-  bitterness: {},
-  body: {},
-  aroma: {},
-  aftertaste: {},
-  radarChart: {},
-  memo: {},
+  loadingText: {
+    fontSize: 20,
+    color: "#555",
+  },
+  errorText: {
+    fontSize: 18,
+    color: "#dc3545",
+  },
 });

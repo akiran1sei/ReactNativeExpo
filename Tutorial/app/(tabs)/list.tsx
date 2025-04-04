@@ -8,8 +8,8 @@ import {
   Platform,
   ImageSourcePropType,
   RefreshControl,
-  TouchableOpacity, // TouchableOpacity をインポート
-  Alert, // Alert をインポート
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import HeaderComponent from "../../components/HeaderComponent";
@@ -17,12 +17,12 @@ import PageTitleComponent from "../../components/PageTitleComponent";
 import CoffeeStorageService from "../../services/CoffeeStorageService";
 import { CoffeeRecord } from "../../types/CoffeeTypes";
 import RadarChart from "../../components/RadarChart/RadarChart";
-import Checkbox from "expo-checkbox"; // チェックボックスを追加
+import Checkbox from "expo-checkbox";
 
 export default function ListScreen() {
   const router = useRouter();
   const [coffeeRecords, setCoffeeRecords] = useState<CoffeeRecord[]>([]);
-  const [selectedRecords, setSelectedRecords] = useState<string[]>([]); // 選択されたIDの配列を管理
+  const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -37,22 +37,6 @@ export default function ListScreen() {
       console.error("データの取得に失敗しました:", error);
     }
   };
-
-  const [selectedRecord, setSelectedRecord] = useState<CoffeeRecord | null>(
-    null
-  );
-
-  // Define default range values
-  const defaultRangeValues = {
-    acidity: 5,
-    bitter: 5,
-    sweet: 5,
-    rich: 5,
-    aroma: 5,
-    aftertaste: 5,
-  };
-
-  const [rangeValues, setRangeValues] = useState(defaultRangeValues);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -76,22 +60,38 @@ export default function ListScreen() {
         ? "このレコードを削除しますか？"
         : `選択した ${selectedRecords.length} 件のレコードを削除しますか？`;
 
-    // Web環境とモバイル環境で確認ダイアログを出し分ける
-    if (Platform.OS === "web") {
-      // Web環境の場合、window.confirm を使用
-      if (window.confirm(message)) {
-        try {
-          for (const id of selectedRecords) {
-            await CoffeeStorageService.deleteCoffeeRecord(id);
-          }
-          setSelectedRecords([]); // 削除後に選択をリセット
-          await fetchData();
-        } catch (error) {
-          console.error("レコードの削除に失敗しました:", error);
+    confirmDelete(message, async () => {
+      try {
+        for (const id of selectedRecords) {
+          await CoffeeStorageService.deleteCoffeeRecord(id);
         }
+        setSelectedRecords([]);
+        await fetchData();
+      } catch (error) {
+        console.error("レコードの削除に失敗しました:", error);
+      }
+    });
+  };
+
+  // 単一レコードの削除
+  const handleDeleteRecord = async (id: string) => {
+    confirmDelete("このレコードを削除しますか？", async () => {
+      try {
+        await CoffeeStorageService.deleteCoffeeRecord(id);
+        await fetchData();
+      } catch (error) {
+        console.error("レコードの削除に失敗しました:", error);
+      }
+    });
+  };
+
+  // 削除確認ダイアログを表示
+  const confirmDelete = (message: string, onConfirm: () => void) => {
+    if (Platform.OS === "web") {
+      if (window.confirm(message)) {
+        onConfirm();
       }
     } else {
-      // モバイル環境の場合、Alert.alert を使用
       Alert.alert(
         "削除確認",
         message,
@@ -100,24 +100,15 @@ export default function ListScreen() {
           {
             text: "削除",
             style: "destructive",
-            onPress: async () => {
-              try {
-                for (const id of selectedRecords) {
-                  await CoffeeStorageService.deleteCoffeeRecord(id);
-                }
-                setSelectedRecords([]); // 削除後に選択をリセット
-                await fetchData();
-              } catch (error) {
-                console.error("レコードの削除に失敗しました:", error);
-              }
-            },
+            onPress: onConfirm,
           },
         ],
         { cancelable: false }
       );
     }
   };
-  // 画像URIを環境に応じて適切に処理する関数 - Fixed return type
+
+  // 画像URIを環境に応じて適切に処理する関数
   const getImageSource = (uri?: string | null): ImageSourcePropType => {
     if (!uri) {
       return require("../../assets/images/no-image.png");
@@ -128,7 +119,7 @@ export default function ListScreen() {
       if (uri.startsWith("data:image")) {
         return { uri };
       }
-      // web環境でfileプロトコルは使用できないため、デフォルトの画像を表示する。
+      // web環境でfileプロトコルは使用できないため、デフォルトの画像を表示
       return require("../../assets/images/no-image.png");
     } else {
       // モバイル環境の場合
@@ -136,53 +127,137 @@ export default function ListScreen() {
     }
   };
 
-  const handleDeleteRecord = async (id: string) => {
-    if (Platform.OS === "web") {
-      // Web環境の場合、window.confirm を使用
-      if (window.confirm("このレコードを削除しますか？")) {
-        try {
-          await CoffeeStorageService.deleteCoffeeRecord(id);
-          await fetchData();
-        } catch (error) {
-          console.error("レコードの削除に失敗しました:", error);
-        }
-      }
-    } else {
-      // モバイル環境の場合、Alert.alert を使用
-      Alert.alert(
-        "削除確認",
-        "このレコードを削除しますか？",
-        [
-          {
-            text: "キャンセル",
-            style: "cancel",
-          },
-          {
-            text: "削除",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                await CoffeeStorageService.deleteCoffeeRecord(id);
-                await fetchData();
-              } catch (error) {
-                console.error("レコードの削除に失敗しました:", error);
-              }
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-    }
+  // レコードアイテムをレンダリング
+  const renderCoffeeRecord = (record: CoffeeRecord) => {
+    return (
+      <View key={record.id} style={styles.wrapContainer}>
+        <Checkbox
+          value={selectedRecords.includes(record.id)}
+          onValueChange={() => toggleSelection(record.id)}
+          style={styles.checkbox}
+        />
+
+        <TouchableOpacity
+          onPress={() => router.push({ pathname: `./item/${record.id}` })}
+          style={styles.recordItemTouchable}
+        >
+          <View style={styles.recordItem}>
+            {/* ヘッダー情報 */}
+            <View style={styles.recordHeader}>
+              <Text style={styles.recordTitle}>{record.name}</Text>
+              <Image
+                source={getImageSource(record.imageUri)}
+                style={styles.recordImagePreview}
+                defaultSource={require("../../assets/images/no-image.png")}
+              />
+            </View>
+
+            {/* メイン情報 */}
+            <View style={styles.recordMainInfo}>
+              <View style={styles.infoColumn}>
+                <InfoRow label="種類" value={record.variety} />
+                <InfoRow label="産地" value={record.productionArea} />
+                <InfoRow label="焙煎度" value={record.roastingDegree} />
+                <InfoRow label="抽出器具" value={record.extractionMethod} />
+                <InfoRow label="抽出メーカー" value={record.extractionMaker} />
+              </View>
+
+              <View style={styles.infoColumn}>
+                <InfoRow label="挽き目" value={record.grindSize} />
+                <InfoRow label="注湯温度" value={record.temperature} />
+                <InfoRow label="粉量" value={record.coffeeAmount} />
+                <InfoRow label="水量" value={record.waterAmount} />
+                <InfoRow label="抽出時間" value={record.extractionTime} />
+              </View>
+            </View>
+
+            {/* テイスティングノート */}
+            <View style={styles.tastingSection}>
+              <Text style={styles.sectionTitle}>テイスティングノート</Text>
+              <View style={styles.tastingGrid}>
+                <TastingValue label="酸味" value={record.acidity} />
+                <TastingValue label="甘味" value={record.sweetness} />
+                <TastingValue label="苦味" value={record.bitterness} />
+                <TastingValue label="コク" value={record.body} />
+                <TastingValue label="香り" value={record.aroma} />
+                <TastingValue label="後味" value={record.aftertaste} />
+              </View>
+            </View>
+
+            {/* レーダーチャート */}
+            <View style={styles.radarChartContainer}>
+              <Text style={styles.sectionTitle}>フレーバープロファイル</Text>
+              <View style={styles.recordRadarChart}>
+                <RadarChart
+                  data={{
+                    acidity: Number(record.acidity) || 0,
+                    bitterness: Number(record.bitterness) || 0,
+                    sweetness: Number(record.sweetness) || 0,
+                    body: Number(record.body) || 0,
+                    aroma: Number(record.aroma) || 0,
+                    aftertaste: Number(record.aftertaste) || 0,
+                  }}
+                />
+              </View>
+            </View>
+
+            {/* メモ */}
+            {record.memo && (
+              <View style={styles.memoContainer}>
+                <Text style={styles.sectionTitle}>メモ</Text>
+                <Text style={styles.memoText}>{record.memo}</Text>
+              </View>
+            )}
+
+            {/* 削除ボタン */}
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteRecord(record.id)}
+            >
+              <Text style={styles.deleteButtonText}>削除</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
-  const TextData = "Coffee List"; // ページタイトルに表示するテキスト
+  // 情報の行を表示するサブコンポーネント
+  const InfoRow = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value: string | number;
+  }) => (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
+
+  // テイスティング値を表示するサブコンポーネント
+  const TastingValue = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value: string | number;
+  }) => (
+    <View style={styles.tastingItem}>
+      <Text style={styles.tastingLabel}>{label}</Text>
+      <View style={styles.tastingValueContainer}>
+        <Text style={styles.tastingValue}>{value}</Text>
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <View style={styles.contents}>
-        {/* ヘッダーコンポーネントを配置 */}
         <HeaderComponent />
-        <PageTitleComponent TextData={TextData} />
+        <PageTitleComponent TextData={"Coffee List"} />
+
         <View style={[styles.absoluteBox, styles.mainContents]}>
           <ScrollView
             style={{ flex: 1 }}
@@ -199,325 +274,20 @@ export default function ListScreen() {
               contentContainerStyle={styles.innerScrollContainer}
             >
               <View style={styles.recordContainer}>
-                {coffeeRecords.map((record) => (
-                  <View key={record.id} style={styles.wrapContainer}>
-                    {/* チェックボックスを追加（リストアイテムの選択用） */}
-                    <Checkbox
-                      value={selectedRecords.includes(record.id)}
-                      onValueChange={() => toggleSelection(record.id)}
-                    />
-
-                    <TouchableOpacity
-                      key={record.id}
-                      onPress={() =>
-                        router.push({ pathname: `./item/${record.id}` })
-                      }
-                    >
-                      <View style={styles.recordItem}>
-                        <View style={styles.nameContainer}>
-                          <Text
-                            style={[styles.text, styles.labelText, styles.name]}
-                          >
-                            コーヒー豆
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.name}
-                          </Text>
-                        </View>
-                        <View style={styles.imageUriContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.imageUri,
-                            ]}
-                          >
-                            画像
-                          </Text>
-                          {/* 画像表示部分 */}
-                          <Image
-                            source={getImageSource(record.imageUri)}
-                            style={styles.recordImagePreview}
-                            defaultSource={require("../../assets/images/no-image.png")} // Optional fallback
-                          />
-                        </View>
-                        <View style={styles.varietyContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.variety,
-                            ]}
-                          >
-                            種類
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.variety}
-                          </Text>
-                        </View>
-                        <View style={styles.productionAreaContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.productionArea,
-                            ]}
-                          >
-                            産地
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.productionArea}
-                          </Text>
-                        </View>
-                        <View style={styles.roastingDegreeContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.roastingDegree,
-                            ]}
-                          >
-                            焙煎度
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.roastingDegree}
-                          </Text>
-                        </View>
-                        <View style={styles.extractionMethodContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.extractionMethod,
-                            ]}
-                          >
-                            抽出器具
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.extractionMethod}
-                          </Text>
-                        </View>
-                        <View style={styles.extractionMakerContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.extractionMaker,
-                            ]}
-                          >
-                            抽出メーカー
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.extractionMaker}
-                          </Text>
-                        </View>
-                        <View style={styles.grindSizeContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.grindSize,
-                            ]}
-                          >
-                            挽き目
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.grindSize}
-                          </Text>
-                        </View>
-                        <View style={styles.temperatureContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.temperature,
-                            ]}
-                          >
-                            注湯温度
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.temperature}
-                          </Text>
-                        </View>
-                        <View style={styles.coffeeAmountContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.coffeeAmount,
-                            ]}
-                          >
-                            粉量
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.coffeeAmount}
-                          </Text>
-                        </View>
-                        <View style={styles.waterAmountContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.waterAmount,
-                            ]}
-                          >
-                            水量
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.waterAmount}
-                          </Text>
-                        </View>
-                        <View style={styles.extractionTimeContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.extractionTime,
-                            ]}
-                          >
-                            抽出時間
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.extractionTime}
-                          </Text>
-                        </View>
-
-                        <View style={styles.acidityContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.acidity,
-                            ]}
-                          >
-                            酸味
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.acidity}
-                          </Text>
-                        </View>
-                        <View style={styles.sweetnessContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.sweetness,
-                            ]}
-                          >
-                            甘味
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.sweetness}
-                          </Text>
-                        </View>
-                        <View style={styles.bitternessContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.bitterness,
-                            ]}
-                          >
-                            苦味
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.bitterness}
-                          </Text>
-                        </View>
-                        <View style={styles.bodyContainer}>
-                          <Text
-                            style={[styles.text, styles.labelText, styles.body]}
-                          >
-                            コク
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.body}
-                          </Text>
-                        </View>
-                        <View style={styles.aromaContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.aroma,
-                            ]}
-                          >
-                            香り
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.aroma}
-                          </Text>
-                        </View>
-                        <View style={styles.aftertasteContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.aftertaste,
-                            ]}
-                          >
-                            後味
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.aftertaste}
-                          </Text>
-                        </View>
-                        <View style={styles.radarChartContainer}>
-                          <Text
-                            style={[
-                              styles.text,
-                              styles.labelText,
-                              styles.radarChart,
-                            ]}
-                          >
-                            radarChart
-                          </Text>
-                          <View style={styles.recordRadarChart}>
-                            <RadarChart
-                              data={{
-                                acidity: Number(record.acidity) || 0,
-                                bitterness: Number(record.bitterness) || 0,
-                                sweetness: Number(record.sweetness) || 0,
-                                body: Number(record.body) || 0,
-                                aroma: Number(record.aroma) || 0,
-                                aftertaste: Number(record.aftertaste) || 0,
-                              }}
-                            />
-                          </View>
-                        </View>
-                        <View style={styles.memoContainer}>
-                          <Text
-                            style={[styles.text, styles.labelText, styles.memo]}
-                          >
-                            MEMO
-                          </Text>
-                          <Text style={[styles.text, styles.valueText]}>
-                            {record.memo}
-                          </Text>
-                        </View>
-                        <TouchableOpacity
-                          style={styles.deleteButton}
-                          onPress={() => handleDeleteRecord(record.id)}
-                        >
-                          <Text style={styles.deleteButtonText}>削除</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                {coffeeRecords.map(renderCoffeeRecord)}
               </View>
             </ScrollView>
-            {/* 縦方向にスクロールするコンテンツ */}
           </ScrollView>
-          {/* 削除ボタン */}
+
+          {/* 一括削除ボタン */}
           {selectedRecords.length > 0 && (
             <TouchableOpacity
-              style={styles.deleteButton}
+              style={styles.batchDeleteButton}
               onPress={handleDeleteSelected}
             >
               <Text style={styles.deleteButtonText}>
                 {selectedRecords.length === 1
-                  ? "削除"
+                  ? "1件のレコードを削除"
                   : `選択した ${selectedRecords.length} 件を削除`}
               </Text>
             </TouchableOpacity>
@@ -535,8 +305,8 @@ const styles = StyleSheet.create({
   },
   contents: {
     flex: 1,
-    justifyContent: "center", // 縦方向の中心に配置
-    alignItems: "center", // 横方向の中心に配置
+    justifyContent: "center",
+    alignItems: "center",
   },
   absoluteBox: {
     flex: 1,
@@ -546,53 +316,170 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   mainContents: {
-    flex: 1, // flex: 1 を追加
+    flex: 1,
     width: "100%",
     marginHorizontal: "auto",
     top: 210,
     bottom: 0,
   },
-  scrollContainer: {
-    alignItems: "center", // 子要素を中央揃え
-    paddingVertical: 20,
-    paddingBottom: 40, // スクロール時の下部余白を追加
-  },
   innerScrollContainer: {
-    flexDirection: "row", // 子要素を横方向に配置
+    flexDirection: "row",
+    paddingVertical: 20,
   },
   recordContainer: {
     flex: 1,
     flexDirection: "row",
+    flexWrap: "wrap",
     width: "100%",
     height: "auto",
-    marginVertical: 50,
+    marginVertical: 20,
+    justifyContent: "center",
+  },
+  wrapContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: 20,
+    width: 350,
+    margin: 10,
+  },
+  recordItemTouchable: {
+    width: "100%",
   },
   recordItem: {
-    width: 300,
-    height: "auto",
-    marginHorizontal: 20,
-    flexDirection: "column",
+    width: "100%",
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  recordHeader: {
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  recordTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#5D4037",
+    marginBottom: 12,
     textAlign: "center",
   },
   recordImagePreview: {
     width: 200,
     height: 200,
     borderRadius: 10,
-    marginHorizontal: "auto",
-    backgroundColor: "#F0F0F0", // デフォルト画像がない場合の背景色
+    marginVertical: 8,
+    backgroundColor: "#F0F0F0",
   },
-  recordRadarChart: { margin: 20, width: "auto", height: "auto" },
-  labelText: {
-    color: "#D2B48C",
-    paddingVertical: 10,
+  recordMainInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  infoColumn: {
+    flex: 1,
+  },
+  infoRow: {
+    marginVertical: 4,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: "#A1887F",
+    fontWeight: "500",
+    marginBottom: 2,
+  },
+  infoValue: {
+    fontSize: 1,
+    color: "#333",
+  },
+  tastingSection: {
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#5D4037",
+    marginBottom: 12,
     textAlign: "center",
   },
-  valueText: { textAlign: "center" },
+  tastingGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  tastingItem: {
+    width: "30%",
+    marginBottom: 12,
+    alignItems: "center",
+  },
+  tastingLabel: {
+    fontSize: 14,
+    color: "#A1887F",
+    marginBottom: 4,
+  },
+  tastingValueContainer: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#D7CCC8",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tastingValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#5D4037",
+  },
+  radarChartContainer: {
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  recordRadarChart: {
+    width: 250,
+    height: 250,
+    alignSelf: "center",
+  },
+  memoContainer: {
+    marginBottom: 16,
+  },
+  memoText: {
+    fontSize: 16,
+    color: "#333",
+    backgroundColor: "#F5F5F5",
+    padding: 12,
+    borderRadius: 8,
+    lineHeight: 22,
+  },
+  checkbox: {
+    marginBottom: 8,
+    alignSelf: "flex-start",
+    marginLeft: 8,
+    width: 20,
+    height: 20,
+  },
   deleteButton: {
-    backgroundColor: "#FF6347", // Tomato red
+    backgroundColor: "#D32F2F",
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  batchDeleteButton: {
+    backgroundColor: "#D32F2F",
     padding: 15,
     borderRadius: 8,
-    marginTop: 20,
+    marginVertical: 16,
     width: "80%",
     alignSelf: "center",
   },
@@ -601,97 +488,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 16,
-  },
-  imageUriContainer: {},
-  nameContainer: {},
-  varietyContainer: {},
-  productionAreaContainer: {},
-  roastingDegreeContainer: {},
-  extractionMethodContainer: {},
-  extractionMakerContainer: {},
-  grindSizeContainer: {},
-  temperatureContainer: {},
-  coffeeAmountContainer: {},
-  waterAmountContainer: {},
-  extractionTimeContainer: {},
-  acidityContainer: {},
-  sweetnessContainer: {},
-  bitternessContainer: {},
-  bodyContainer: {},
-  aromaContainer: {},
-  aftertasteContainer: {},
-  radarChartContainer: {},
-  memoContainer: {},
-  imageUri: {
-    // imageUri スタイル
-    width: "auto",
-    height: "auto",
-  },
-  name: {
-    // name スタイル
-  },
-  variety: {
-    // variety スタイル
-  },
-  productionArea: {
-    // productionArea スタイル
-  },
-  roastingDegree: {
-    // roastingDegree スタイル
-  },
-  extractionMethod: {
-    // extractionMethod スタイル
-  },
-  extractionMaker: {
-    // extractionMaker スタイル
-  },
-  grindSize: {
-    // grindSize スタイル
-  },
-  temperature: {
-    // temperature スタイル
-  },
-  coffeeAmount: {
-    // coffeeAmount スタイル
-  },
-  waterAmount: {
-    // waterAmount スタイル
-  },
-  extractionTime: {
-    // extractionTime スタイル
-  },
-  acidity: {
-    // acidity スタイル
-  },
-  sweetness: {
-    // sweetness スタイル
-  },
-  bitterness: {
-    // bitterness スタイル
-  },
-  body: {
-    // body スタイル
-  },
-  aroma: {
-    // aroma スタイル
-  },
-  aftertaste: {
-    // aftertaste スタイル
-  },
-  radarChart: {
-    // radarChart スタイル
-  },
-  memo: {
-    // memo スタイル
-  },
-  text: {
-    color: "#000",
-    fontSize: 18,
-  },
-  wrapContainer: {
-    flexDirection: "column",
-
-    alignItems: "center",
-    marginBottom: 10,
   },
 });

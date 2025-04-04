@@ -11,8 +11,8 @@ import {
   Text,
   Alert,
 } from "react-native";
-import { Link, useRoute } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+import { useRoute } from "@react-navigation/native";
 import HeaderComponent from "../../../components/HeaderComponent";
 import PageTitleComponent from "../../../components/PageTitleComponent";
 import CoffeeStorageService from "../../../services/CoffeeStorageService";
@@ -55,7 +55,7 @@ export default function CoffeeItemScreen() {
   });
   const [NumberLabel, setNumberLabel] = useState({
     temperature: "温度（℃）",
-    coffeeAmount: "紛量（g）",
+    coffeeAmount: "粉量（g）",
     waterAmount: "湯量（g）",
   });
   const [coffeeRecord, setCoffeeRecord] = useState<CoffeeRecord | null>(null);
@@ -66,7 +66,6 @@ export default function CoffeeItemScreen() {
   const [updating, setUpdating] = useState(false);
 
   const handleInputChange = (label: string, value: string | number) => {
-    // 空の文字列も有効な値として扱う
     setFormData({ ...formData, [label]: value });
   };
 
@@ -344,215 +343,233 @@ export default function CoffeeItemScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.contents}>
         <HeaderComponent />
-        <PageTitleComponent TextData={"Coffee Update"} />
+        <PageTitleComponent TextData={"コーヒー情報を編集"} />
         <View style={[styles.absoluteBox, styles.mainContents]}>
           <ScrollView
             contentContainerStyle={styles.scrollContainer}
-            showsVerticalScrollIndicator={true}
+            showsVerticalScrollIndicator={false}
           >
-            <InputComponent
-              dataTitle={InputLabel.name}
-              onChange={(value: string) => handleInputChange("name", value)}
-              value={formData.name !== undefined ? formData.name : ""}
-            />
-            <ImageUploadComponent
-              onChange={handleImageChange}
-              value={formData.imageUri !== undefined ? formData.imageUri : ""}
-            />
-            <InputComponent
-              dataTitle={InputLabel.variety}
-              onChange={(value: string) => handleInputChange("variety", value)}
-              value={formData.variety !== undefined ? formData.variety : ""}
-            />
-            <InputComponent
-              dataTitle={InputLabel.productionArea}
-              onChange={(value: string) =>
-                handleInputChange("productionArea", value)
-              }
-              value={
-                formData.productionArea !== undefined
-                  ? formData.productionArea
-                  : ""
-              }
-            />
-            <SelectComponent
-              dataTitle={SelectLabel.roastingDegree}
-              onChange={(value: string) =>
-                handleSelectChange("roastingDegree", value)
-              }
-              value={
-                formData.roastingDegree !== undefined
-                  ? formData.roastingDegree
-                  : ""
-              }
-            />
-            <SelectComponent
-              dataTitle={SelectLabel.extractionMethod}
-              onChange={(value: string) =>
-                handleSelectChange("extractionMethod", value)
-              }
-              value={
-                formData.extractionMethod !== undefined
-                  ? formData.extractionMethod
-                  : ""
-              }
-            />
-            <SelectComponent
-              dataTitle={SelectLabel.extractionMaker}
-              onChange={(value: string) =>
-                handleSelectChange("extractionMaker", value)
-              }
-              value={
-                formData.extractionMaker !== undefined
-                  ? formData.extractionMaker
-                  : ""
-              }
-            />
-            <SelectComponent
-              dataTitle={SelectLabel.grindSize}
-              onChange={(value: string) =>
-                handleSelectChange("grindSize", value)
-              }
-              value={formData.grindSize !== undefined ? formData.grindSize : ""}
-            />
-            <NumberComponent
-              dataTitle={NumberLabel.temperature}
-              onChange={(value: number) =>
-                handleInputChange("temperature", value)
-              }
-              value={
-                formData.temperature !== undefined ? formData.temperature : 0
-              }
-            />
-            <NumberComponent
-              dataTitle={NumberLabel.coffeeAmount}
-              onChange={(value: number) =>
-                handleInputChange("coffeeAmount", value)
-              }
-              value={
-                formData.coffeeAmount !== undefined ? formData.coffeeAmount : 0
-              }
-            />
-            <NumberComponent
-              dataTitle={NumberLabel.waterAmount}
-              onChange={(value: number) =>
-                handleInputChange("waterAmount", value)
-              }
-              value={
-                formData.waterAmount !== undefined ? formData.waterAmount : 0
-              }
-            />
-            <MeasuredTimeInputComponent
-              onChange={handleMeasuredTimeChange}
-              value={
-                formData.extractionTime !== undefined
-                  ? formData.extractionTime
-                  : ""
-              }
-            />
-            <RangeComponent
-              dataTitle={RangeLabel.acidity}
-              onChange={(value: number) => handleRangeChange("acidity", value)}
-              value={
-                rangeValues.acidity !== undefined ? rangeValues.acidity : 0
-              }
-            />
-            <RangeComponent
-              dataTitle={RangeLabel.bitterness}
-              onChange={(value: number) =>
-                handleRangeChange("bitterness", value)
-              }
-              value={
-                rangeValues.bitterness !== undefined
-                  ? rangeValues.bitterness
-                  : 0
-              }
-            />
-            <RangeComponent
-              dataTitle={RangeLabel.sweetness}
-              onChange={(value: number) =>
-                handleRangeChange("sweetness", value)
-              }
-              value={
-                rangeValues.sweetness !== undefined ? rangeValues.sweetness : 0
-              }
-            />
-            <RangeComponent
-              dataTitle={RangeLabel.body}
-              onChange={(value: number) => handleRangeChange("body", value)}
-              value={rangeValues.body !== undefined ? rangeValues.body : 0}
-            />
-            <RangeComponent
-              dataTitle={RangeLabel.aroma}
-              onChange={(value: number) => handleRangeChange("aroma", value)}
-              value={rangeValues.aroma !== undefined ? rangeValues.aroma : 0}
-            />
-            <RangeComponent
-              dataTitle={RangeLabel.aftertaste}
-              onChange={(value: number) =>
-                handleRangeChange("aftertaste", value)
-              }
-              value={
-                rangeValues.aftertaste !== undefined
-                  ? rangeValues.aftertaste
-                  : 0
-              }
-            />
-            <RadarChart
-              data={{
-                acidity:
-                  rangeValues.acidity !== undefined ? rangeValues.acidity : 0,
-                bitterness:
+            <View style={styles.formContainer}>
+              <InputComponent
+                dataTitle={InputLabel.name}
+                onChange={(value: string) => handleInputChange("name", value)}
+                value={formData.name !== undefined ? formData.name : ""}
+              />
+              <ImageUploadComponent
+                onChange={handleImageChange}
+                value={formData.imageUri !== undefined ? formData.imageUri : ""}
+              />
+              <InputComponent
+                dataTitle={InputLabel.variety}
+                onChange={(value: string) =>
+                  handleInputChange("variety", value)
+                }
+                value={formData.variety !== undefined ? formData.variety : ""}
+              />
+              <InputComponent
+                dataTitle={InputLabel.productionArea}
+                onChange={(value: string) =>
+                  handleInputChange("productionArea", value)
+                }
+                value={
+                  formData.productionArea !== undefined
+                    ? formData.productionArea
+                    : ""
+                }
+              />
+              <SelectComponent
+                dataTitle={SelectLabel.roastingDegree}
+                onChange={(value: string) =>
+                  handleSelectChange("roastingDegree", value)
+                }
+                value={
+                  formData.roastingDegree !== undefined
+                    ? formData.roastingDegree
+                    : ""
+                }
+              />
+              <SelectComponent
+                dataTitle={SelectLabel.extractionMethod}
+                onChange={(value: string) =>
+                  handleSelectChange("extractionMethod", value)
+                }
+                value={
+                  formData.extractionMethod !== undefined
+                    ? formData.extractionMethod
+                    : ""
+                }
+              />
+              <SelectComponent
+                dataTitle={SelectLabel.extractionMaker}
+                onChange={(value: string) =>
+                  handleSelectChange("extractionMaker", value)
+                }
+                value={
+                  formData.extractionMaker !== undefined
+                    ? formData.extractionMaker
+                    : ""
+                }
+              />
+              <SelectComponent
+                dataTitle={SelectLabel.grindSize}
+                onChange={(value: string) =>
+                  handleSelectChange("grindSize", value)
+                }
+                value={
+                  formData.grindSize !== undefined ? formData.grindSize : ""
+                }
+              />
+              <NumberComponent
+                dataTitle={NumberLabel.temperature}
+                onChange={(value: number) =>
+                  handleInputChange("temperature", value)
+                }
+                value={
+                  formData.temperature !== undefined ? formData.temperature : 0
+                }
+              />
+              <NumberComponent
+                dataTitle={NumberLabel.coffeeAmount}
+                onChange={(value: number) =>
+                  handleInputChange("coffeeAmount", value)
+                }
+                value={
+                  formData.coffeeAmount !== undefined
+                    ? formData.coffeeAmount
+                    : 0
+                }
+              />
+              <NumberComponent
+                dataTitle={NumberLabel.waterAmount}
+                onChange={(value: number) =>
+                  handleInputChange("waterAmount", value)
+                }
+                value={
+                  formData.waterAmount !== undefined ? formData.waterAmount : 0
+                }
+              />
+              <MeasuredTimeInputComponent
+                onChange={handleMeasuredTimeChange}
+                value={
+                  formData.extractionTime !== undefined
+                    ? formData.extractionTime
+                    : ""
+                }
+              />
+              <RangeComponent
+                dataTitle={RangeLabel.acidity}
+                onChange={(value: number) =>
+                  handleRangeChange("acidity", value)
+                }
+                value={
+                  rangeValues.acidity !== undefined ? rangeValues.acidity : 0
+                }
+              />
+              <RangeComponent
+                dataTitle={RangeLabel.bitterness}
+                onChange={(value: number) =>
+                  handleRangeChange("bitterness", value)
+                }
+                value={
                   rangeValues.bitterness !== undefined
                     ? rangeValues.bitterness
-                    : 0,
-                sweetness:
+                    : 0
+                }
+              />
+              <RangeComponent
+                dataTitle={RangeLabel.sweetness}
+                onChange={(value: number) =>
+                  handleRangeChange("sweetness", value)
+                }
+                value={
                   rangeValues.sweetness !== undefined
                     ? rangeValues.sweetness
-                    : 0,
-                body: rangeValues.body !== undefined ? rangeValues.body : 0,
-                aroma: rangeValues.aroma !== undefined ? rangeValues.aroma : 0,
-                aftertaste:
+                    : 0
+                }
+              />
+              <RangeComponent
+                dataTitle={RangeLabel.body}
+                onChange={(value: number) => handleRangeChange("body", value)}
+                value={rangeValues.body !== undefined ? rangeValues.body : 0}
+              />
+              <RangeComponent
+                dataTitle={RangeLabel.aroma}
+                onChange={(value: number) => handleRangeChange("aroma", value)}
+                value={rangeValues.aroma !== undefined ? rangeValues.aroma : 0}
+              />
+              <RangeComponent
+                dataTitle={RangeLabel.aftertaste}
+                onChange={(value: number) =>
+                  handleRangeChange("aftertaste", value)
+                }
+                value={
                   rangeValues.aftertaste !== undefined
                     ? rangeValues.aftertaste
-                    : 0,
-              }}
-            />
+                    : 0
+                }
+              />
+              <View style={styles.radarChartContainer}>
+                <Text style={styles.radarChartTitle}>風味の評価</Text>
+                <RadarChart
+                  data={{
+                    acidity:
+                      rangeValues.acidity !== undefined
+                        ? rangeValues.acidity
+                        : 0,
+                    bitterness:
+                      rangeValues.bitterness !== undefined
+                        ? rangeValues.bitterness
+                        : 0,
+                    sweetness:
+                      rangeValues.sweetness !== undefined
+                        ? rangeValues.sweetness
+                        : 0,
+                    body: rangeValues.body !== undefined ? rangeValues.body : 0,
+                    aroma:
+                      rangeValues.aroma !== undefined ? rangeValues.aroma : 0,
+                    aftertaste:
+                      rangeValues.aftertaste !== undefined
+                        ? rangeValues.aftertaste
+                        : 0,
+                  }}
+                />
+              </View>
 
-            <TextAreaComponent
-              onChange={handleTextAreaChange}
-              value={formData.memo !== undefined ? formData.memo : ""}
-            />
+              <TextAreaComponent
+                onChange={handleTextAreaChange}
+                value={formData.memo !== undefined ? formData.memo : ""}
+              />
 
-            {/* Update Button */}
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={handleUpdateRecord}
-              disabled={updating}
-            >
-              <Text style={styles.updateButtonText}>
-                {updating ? "更新中..." : "コーヒー情報を更新する"}
-              </Text>
-            </TouchableOpacity>
+              {/* Update Button */}
+              <TouchableOpacity
+                style={styles.updateButton}
+                onPress={handleUpdateRecord}
+                disabled={updating}
+              >
+                <Text style={styles.updateButtonText}>
+                  {updating ? "更新中..." : "コーヒー情報を更新する"}
+                </Text>
+              </TouchableOpacity>
 
-            {/* Delete Button */}
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeleteRecord(id)}
-              disabled={updating}
-            >
-              <Text style={styles.deleteButtonText}>
-                コーヒー情報を削除する
-              </Text>
-            </TouchableOpacity>
+              {/* Delete Button */}
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDeleteRecord(id)}
+                disabled={updating}
+              >
+                <Text style={styles.deleteButtonText}>
+                  コーヒー情報を削除する
+                </Text>
+              </TouchableOpacity>
 
-            {/* Return to List Button */}
-            <TouchableOpacity
-              style={styles.returnButton}
-              onPress={() => router.push("/list")}
-            >
-              <Text style={styles.returnButtonText}>リストに戻る</Text>
-            </TouchableOpacity>
+              {/* Return to List Button */}
+              <TouchableOpacity
+                style={styles.returnButton}
+                onPress={() => router.push("/list")}
+              >
+                <Text style={styles.returnButtonText}>リストに戻る</Text>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
         </View>
       </View>
@@ -563,7 +580,7 @@ export default function CoffeeItemScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#f4f4f4",
   },
   contents: {
     flex: 1,
@@ -579,15 +596,28 @@ const styles = StyleSheet.create({
   },
   mainContents: {
     width: "100%",
-    maxWidth: 500,
+    maxWidth: 600,
     marginHorizontal: "auto",
-    top: 210,
+    top: 160, // ヘッダーとタイトルに合わせて調整
     bottom: 0,
   },
   scrollContainer: {
-    alignItems: "center",
     paddingVertical: 20,
     paddingBottom: 80, // Increased padding to accommodate buttons
+    width: "100%",
+    alignItems: "center",
+  },
+  formContainer: {
+    width: "90%",
+    maxWidth: 500,
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   imageContents: {
     width: "90%",
@@ -602,24 +632,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#F0F0F0", // デフォルト画像がない場合の背景色
   },
   text: {
-    color: "#000",
-    fontSize: 18,
+    color: "#333",
+    fontSize: 16,
   },
   labelText: {
-    color: "#D2B48C",
-    paddingVertical: 10,
-    textAlign: "center",
+    color: "#777",
+    marginBottom: 5,
+    fontSize: 14,
   },
   valueText: {
-    textAlign: "center",
+    fontSize: 16,
+    color: "#555",
   },
   deleteButton: {
-    backgroundColor: "#FF6347", // Tomato red
-    padding: 15,
+    backgroundColor: "#dc3545", // Bootstrap danger color
+    paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
-    width: "80%",
-    alignSelf: "center",
+    width: "100%",
+    alignItems: "center",
   },
   deleteButtonText: {
     color: "white",
@@ -628,12 +659,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   updateButton: {
-    backgroundColor: "#4682B4", // Steel blue
-    padding: 15,
+    backgroundColor: "#007bff", // Bootstrap primary color
+    paddingVertical: 12,
     borderRadius: 8,
-    marginTop: 30,
-    width: "80%",
-    alignSelf: "center",
+    marginTop: 25,
+    width: "100%",
+    alignItems: "center",
   },
   updateButtonText: {
     color: "white",
@@ -642,17 +673,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   returnButton: {
-    backgroundColor: "#6B8E23", // Olive drab
-    padding: 15,
+    backgroundColor: "#6c757d", // Bootstrap secondary color
+    paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
-    width: "80%",
-    alignSelf: "center",
+    width: "100%",
+    alignItems: "center",
   },
   returnButtonText: {
     color: "white",
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  radarChartContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 25,
+    marginBottom: 15,
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  radarChartTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#555",
+    marginBottom: 10,
   },
 });
