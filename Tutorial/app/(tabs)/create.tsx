@@ -107,6 +107,7 @@ export default function CreateScreen() {
   const [imageData, setImageData] = useState("");
   const [formData, setFormData] = useState({ ...initialFormData });
   const [rangeValues, setRangeValues] = useState({ ...initialRangeValues });
+  console.log(formData);
   // Web環境でフォーム送信後の状態をリセット
   useEffect(() => {
     if (formSubmitted && isWeb) {
@@ -153,6 +154,7 @@ export default function CreateScreen() {
   // 新しい送信ハンドラー
   const handleSubmit = async () => {
     // 型安全な方法で必須フィールドをチェック
+
     const missingFields = (
       Object.keys(formData) as Array<keyof typeof formData>
     ).filter((field) => {
@@ -160,22 +162,27 @@ export default function CreateScreen() {
       return (
         value === null ||
         value === undefined ||
-        value === "" ||
+        (typeof value === "string" && value === "") ||
         (typeof value === "number" && value === 0)
       );
     });
 
-    if (missingFields.length > 0) {
+    // textArea と imageUri を必須フィールドから除外
+    const requiredFields = missingFields.filter(
+      (field) => field !== "textArea" && field !== "imageUri"
+    );
+
+    if (requiredFields.length > 0) {
       if (isWeb) {
         alert(
-          `入力エラー\n以下の必須項目が未入力です：\n${missingFields.join(
+          `入力エラー\n以下の必須項目が未入力です：\n${requiredFields.join(
             ", "
           )}`
         );
       } else {
         Alert.alert(
           "入力エラー",
-          `以下の必須項目が未入力です：\n${missingFields.join(", ")}`
+          `以下の必須項目が未入力です：\n${requiredFields.join(", ")}`
         );
       }
       return;
@@ -290,7 +297,7 @@ export default function CreateScreen() {
 
       // 型安全な変換
       const coffeeRecord: Omit<CoffeeRecord, "id"> = {
-        imageUri: formData.imageUri,
+        imageUri: formData.imageUri || "../../assets/images/no-image.png", // デフォルト画像を設定
         name: formData.beansName,
         variety: formData.variety,
         productionArea: formData.productionArea,
