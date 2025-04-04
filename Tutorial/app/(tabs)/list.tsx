@@ -76,29 +76,46 @@ export default function ListScreen() {
         ? "このレコードを削除しますか？"
         : `選択した ${selectedRecords.length} 件のレコードを削除しますか？`;
 
-    Alert.alert(
-      "削除確認",
-      message,
-      [
-        { text: "キャンセル", style: "cancel" },
-        {
-          text: "削除",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              for (const id of selectedRecords) {
-                await CoffeeStorageService.deleteCoffeeRecord(id);
+    // Web環境とモバイル環境で確認ダイアログを出し分ける
+    if (Platform.OS === "web") {
+      // Web環境の場合、window.confirm を使用
+      if (window.confirm(message)) {
+        try {
+          for (const id of selectedRecords) {
+            await CoffeeStorageService.deleteCoffeeRecord(id);
+          }
+          setSelectedRecords([]); // 削除後に選択をリセット
+          await fetchData();
+        } catch (error) {
+          console.error("レコードの削除に失敗しました:", error);
+        }
+      }
+    } else {
+      // モバイル環境の場合、Alert.alert を使用
+      Alert.alert(
+        "削除確認",
+        message,
+        [
+          { text: "キャンセル", style: "cancel" },
+          {
+            text: "削除",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                for (const id of selectedRecords) {
+                  await CoffeeStorageService.deleteCoffeeRecord(id);
+                }
+                setSelectedRecords([]); // 削除後に選択をリセット
+                await fetchData();
+              } catch (error) {
+                console.error("レコードの削除に失敗しました:", error);
               }
-              setSelectedRecords([]); // 削除後に選択をリセット
-              await fetchData();
-            } catch (error) {
-              console.error("レコードの削除に失敗しました:", error);
-            }
+            },
           },
-        },
-      ],
-      { cancelable: false }
-    );
+        ],
+        { cancelable: false }
+      );
+    }
   };
   // 画像URIを環境に応じて適切に処理する関数 - Fixed return type
   const getImageSource = (uri?: string | null): ImageSourcePropType => {
